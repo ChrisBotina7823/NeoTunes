@@ -2,13 +2,13 @@ package model;
 
 import java.util.Arrays;
 
-public abstract class Audio implements Playable {
+public abstract class Audio {
     private String name;
     private String pictureUrl;
     private int numberOfPlays;
-    private int[] duration;
+    private int duration;
 
-    public Audio(String name, String pictureUrl, int[] duration) {
+    public Audio(String name, String pictureUrl, int duration) {
         this.name = name;
         this.numberOfPlays = 0;
         this.pictureUrl = pictureUrl;
@@ -39,21 +39,23 @@ public abstract class Audio implements Playable {
         this.numberOfPlays = numberOfPlays;
     }
 
-    public int[] getDuration() {
+    public int getDuration() {
         return duration;
     }
 
-    public void setDuration(int[] duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
-
+    public void increaseNumberOfPlays() {
+        this.numberOfPlays++;
+    }
     @Override
     public String toString() {
         return "Audio{" +
                 "name='" + name + '\'' +
                 ", pictureUrl='" + pictureUrl + '\'' +
                 ", numberOfPlays='" + numberOfPlays + '\'' +
-                ", duration=" + Arrays.toString(duration) +
+                ", duration=" + duration +
                 '}';
     }
 }

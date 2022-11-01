@@ -13,4 +13,11 @@ public class PremiumConsumer extends Consumer {
         if(searchPlaylist(newPlaylist.getId()) != null) return false;
         return super.getPlaylists().add(newPlaylist);
     }
+
+    @Override
+    public boolean addSong(Song newSong) {
+        if(searchSong(newSong.getName()) != null) return false;
+        return getSongs().add(newSong);
+    }
+
 }

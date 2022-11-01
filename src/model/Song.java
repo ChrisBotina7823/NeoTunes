@@ -1,6 +1,6 @@
 package model;
 
-import java.util.Arrays;
+import java.time.LocalDate;
 
 public class Song extends Audio {
     private SongGenre genre;
@@ -8,7 +8,9 @@ public class Song extends Audio {
     private double saleValue;
     private int numberOfSales;
 
-    public Song(String name, String pictureUrl, int[] duration, int genre, String album, double saleValue) {
+    private LocalDate purchaseDate;
+
+    public Song(String name, String pictureUrl,int duration, int genre, String album, double saleValue) {
         super(name, pictureUrl, duration);
 
         if(genre < 0 || genre >= SongGenre.values().length) {
@@ -27,6 +29,14 @@ public class Song extends Audio {
         }
 
         this.numberOfSales = 0;
+    }
+
+    public LocalDate getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(LocalDate purchaseDate) {
+        this.purchaseDate = purchaseDate;
     }
 
     public SongGenre getGenre() {
@@ -66,7 +76,7 @@ public class Song extends Audio {
         return "Song{" +
                 "name='" + super.getName() + '\'' +
                 ", pictureUrl='" + super.getPictureUrl() + '\'' +
-                ", duration=" + Arrays.toString(super.getDuration()) +
+                ", duration=" + super.getDuration() +
                 ", genre=" + genre.toString().toLowerCase() +
                 ", album='" + album + '\'' +
                 ", numberOfPlays='" + super.getNumberOfPlays() + '\'' +

@@ -2,16 +2,26 @@ package model;
 
 import javax.naming.InvalidNameException;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Controller {
     private ArrayList<Producer> producers;
     private ArrayList<Consumer> consumers;
     private ArrayList<Playlist> playlists;
 
+    private ArrayList<Record> purchases;
+
+    private final Advertisement[] ADS = {
+            new Advertisement("Nike - Just Do It", "picture", 10),
+            new Advertisement("Coca-Cola - Open Happiness", "picture", 10),
+            new Advertisement("M&Ms - Melts in your Mouth, not in your hands", "picture", 10),
+    };
+
     public Controller() {
         this.producers = new ArrayList<>();
         this.consumers = new ArrayList<>();
         this.playlists = new ArrayList<>();
+        this.purchases = new ArrayList<>();
     }
 
     // REGISTRATION METHODS
@@ -48,24 +58,24 @@ public class Controller {
         return true;
     }
 
-    public boolean registerSong(String songName, String pictureUrl, int[] duration, int genre, String album, double saleValue, String artistName) {
+    public boolean registerSong(String songName, String pictureUrl, int duration, int genre, String album, double saleValue, String artistName) {
 
         Song newSong = new Song(songName, pictureUrl, duration, genre, album, saleValue);
         Producer foundProducer = searchProducer(artistName);
 
-        if( foundProducer == null || !(foundProducer instanceof Artist) ) throw new IllegalArgumentException("Error: Producer not found");
+        if( foundProducer == null || !(foundProducer instanceof Artist) ) return false;
 
         foundProducer.addAudio(newSong);
 
         return true;
     }
 
-    public boolean registerPodcast(String podcastName, String pictureUrl, int[] duration, int category, String description, String contentCreatorName) {
+    public boolean registerPodcast(String podcastName, String pictureUrl, int duration, int category, String description, String contentCreatorName) {
 
         Podcast newPodcast = new Podcast(podcastName, pictureUrl, duration, category, description);
         Producer foundProducer = searchProducer(contentCreatorName);
 
-        if( foundProducer == null || !(foundProducer instanceof ContentCreator) ) throw new IllegalArgumentException("Error: Producer not found");
+        if( foundProducer == null || !(foundProducer instanceof ContentCreator) ) return false;
 
         foundProducer.addAudio(newPodcast);
 
@@ -87,12 +97,12 @@ public class Controller {
         }
 
         Consumer tmpConsumer = searchConsumer(consumerName);
-        if(tmpConsumer == null) throw new IllegalArgumentException("Error: Consumer not found");
+        if(tmpConsumer == null) return false;
 
         if(tmpConsumer.addPlaylist(newPlaylist)) {
             playlists.add(newPlaylist);
         } else {
-            throw new IllegalArgumentException("Error: Playlist was not added to the consumer list");
+            return false;
         }
         return true;
     }
@@ -101,7 +111,7 @@ public class Controller {
 
     public boolean renamePlaylist(String playlistId, String newName) {
         Playlist tmpPlaylist = searchPlaylist(playlistId);
-        if(tmpPlaylist == null) throw new IllegalArgumentException("Error: Playlist not found");
+        if(tmpPlaylist == null) return false;
         tmpPlaylist.setName(newName);
         return true;
     }
@@ -152,9 +162,23 @@ public class Controller {
 
     public String showConsumerPlaylists(String consumerName) {
         Consumer matchedConsumer = searchConsumer(consumerName);
-        if(matchedConsumer == null) return "";
+        if(matchedConsumer == null) return "Consumer not found";
 
         return matchedConsumer.showPlaylists();
+    }
+
+    public String showPurchases() {
+        String purchasesList = "";
+        for(Record purchase : purchases) {
+            purchasesList += "\n - " + purchase;
+        }
+        return (purchasesList.equals("")) ? ("") : ("\n--- Purchase history --- " ) + purchasesList;
+    }
+
+    public String showConsumerPlaybacks(String consumerName) {
+        Consumer tmpConsumer = searchConsumer(consumerName);
+        if(tmpConsumer == null) return "Consumer not found";
+        return tmpConsumer.showPlaybacks();
     }
 
     // SEARCHING METHODS
@@ -186,5 +210,38 @@ public class Controller {
             if(tmpAudio != null) return tmpAudio;
         }
         return null;
+    }
+
+    // PLAYING
+
+    public String[] playAudio(String consumerName, String audioName) {
+        String[] audioList = new String[2];
+        Random rnd = new Random();
+        Advertisement advertisement = ADS[rnd.nextInt(ADS.length-1)];
+
+        Consumer tmpConsumer = searchConsumer(consumerName);
+        Audio tmpAudio = searchAudio(audioName);
+        if(tmpConsumer == null || tmpAudio == null) return audioList;
+
+        tmpConsumer.playAudio(tmpAudio);
+        if(tmpConsumer instanceof Advertisable) {
+            if(tmpAudio instanceof Podcast || ( (tmpAudio instanceof Song) && ((Advertisable) tmpConsumer).showAdvertise()) ) {
+                audioList[0] = String.format("Playing advertisement: %s\nDuration %s", advertisement.getName(), advertisement.getDuration());
+            }
+        }
+        audioList[1] = String.format("Playing advertisement: %s\nDuration %s", tmpAudio.getName(), tmpAudio.getDuration());;
+        return audioList;
+    }
+
+    // BUYING
+    public boolean buySong(String consumerName, String songName) {
+        Consumer tmpConsumer = searchConsumer(consumerName);
+        Audio tmpAudio = searchAudio(songName);
+        if(tmpConsumer == null || tmpAudio == null || !(tmpAudio instanceof Song)) return false;
+
+        if(tmpConsumer.addSong((Song)tmpAudio)) {
+            purchases.add(new Record(consumerName, tmpAudio));
+        }
+        return true;
     }
 }

@@ -3,7 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Playlist implements Playable {
+public class Playlist {
     private String name;
     private String id;
     private int[][] matrixId;

@@ -7,14 +7,14 @@ public abstract class Consumer extends User {
     private String documentId;
     private ArrayList<Song> songs;
     private ArrayList<Playlist> playlists;
-
+    private ArrayList<Record> playbacks;
 
     public Consumer(String nickname, String documentId) {
-        super();
         this.nickname = nickname;
         this.documentId = documentId;
         this.songs = new ArrayList<>();
         this.playlists = new ArrayList<>();
+        this.playbacks = new ArrayList<>();
     }
 
     // GETTERS AND SETTERS
@@ -54,6 +54,7 @@ public abstract class Consumer extends User {
     // ABSTRACT METHODS
 
     public abstract boolean addPlaylist(Playlist newPlaylist);
+    public abstract boolean addSong(Song newSong);
 
     // FUNCTIONAL
 
@@ -65,12 +66,33 @@ public abstract class Consumer extends User {
         return (playlists.isEmpty()) ? ("") : ("\n--- " + this.nickname + " Playlists ---" + playlistList);
     }
 
+    public String showPlaybacks() {
+        String playbackList = "";
+        for(Record playback : playbacks) {
+            playbackList += "\n - " + playback;
+        }
+        return (playbacks.isEmpty()) ? ("") : ("\n--- " + this.nickname + " Playbacks ---" + playbackList);
+    }
+
     public Playlist searchPlaylist(String id) {
         for(Playlist playlist : playlists) {
-            if(playlist != null && playlist.getId().equals(id)) return playlist;
+            if(playlist.getId().equals(id)) return playlist;
         }
         return null;
     }
+
+    public Song searchSong(String songName) {
+        for(Song song : songs) {
+            if(song.getName().equals(songName)) return song;
+        }
+        return null;
+    }
+
+    public void playAudio(Audio tmpAudio) {
+        playbacks.add(new Record(this.nickname, tmpAudio));
+        tmpAudio.increaseNumberOfPlays();
+    }
+
     @Override
     public String toString() {
         return "Consumer{" +

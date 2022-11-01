@@ -8,7 +8,7 @@ public class SongPlaylist extends Playlist {
 
     @Override
     public void calculateId() {
-        int[][] matrixId = super.getMatrixId();
+        int[][] matrixId = getMatrixId();
         // only songs - n
         String newId = "";
         for(int i=0; i<matrixId.length; i++) {

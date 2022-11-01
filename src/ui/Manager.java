@@ -21,8 +21,8 @@ public class Manager {
     public void showMenu() {
 
         // Registering songs and podcasts
-        int[] podcastDuration = {1, 45, 30};
-        int[] songDuration = {0, 4, 10};
+        int podcastDuration = 2000;
+        int songDuration = 500;
 
         try {
             // Registering producers
@@ -77,9 +77,19 @@ public class Manager {
 
             System.out.println(controller.sharePlaylist("standardConsumer1", flag));
 
+            for(String audio : controller.playAudio("standardConsumer1", "podcastName1")) {
+                if(audio != null) System.out.println(audio + "\nPress enter to play the next Song");
+            }
+            System.out.println(controller.showConsumerPlaybacks("standardConsumer1"));
+
+            controller.buySong("standardConsumer1", "songName1");
+            System.out.println(controller.showPurchases());
+
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
+
+
 
 
     }
