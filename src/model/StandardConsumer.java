@@ -1,7 +1,5 @@
 package model;
 
-import java.util.ArrayList;
-
 public class StandardConsumer extends Consumer implements Advertisable {
 
     private int playedSongs;
@@ -31,7 +29,9 @@ public class StandardConsumer extends Consumer implements Advertisable {
     @Override
     public boolean addSong(Song newSong) {
         if(super.getPlaylists().size() > 100 || searchSong(newSong.getName()) != null) return false;
-        return getSongs().add(newSong);
+        getSongs().add(newSong);
+        newSong.increaseNumberOfSales();
+        return true;
     }
 
     @Override

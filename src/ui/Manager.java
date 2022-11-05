@@ -18,79 +18,272 @@ public class Manager {
         manager.showMenu();
     }
 
-    public void showMenu() {
+    // MENUS
 
-        // Registering songs and podcasts
-        int podcastDuration = 2000;
-        int songDuration = 500;
+    public void showMenu() {
+        int operation;
+        do {
+            System.out.print("""
+                    \nSelect the operation:
+                    0. Exit
+                    1. Registration
+                    2. Interaction
+                    3. Statistics
+                    Option:\s""");
+            operation = sc.nextInt();
+            switch (operation) {
+                case 0 -> System.out.println("\nBye :)");
+                case 1 -> showRegistrationMenu();
+                case 2 -> showInteractionMenu();
+                case 3 -> showStatisticsMenu();
+                default -> System.out.println("\nEnter a valid option");
+            }
+        } while(operation != 0);
+    }
+
+    public void showRegistrationMenu() {
+        System.out.print("""
+                \nSelect the operation
+                0. Exit
+                1. Register Producer
+                2. Register Consumer
+                3. Register audio
+                4. Register playlist
+                Option:\s""");
+        int operation = sc.nextInt();
+        switch (operation) {
+            case 1 -> registerProducer();
+            case 2 -> registerConsumer();
+            case 3 -> registerAudio();
+            case 4 -> registerPlaylist();
+            default -> System.out.println("\nEnter a valid option");
+        }
+    }
+    public void showInteractionMenu() {
+        System.out.print("""
+                \nSelect the operation
+                0. Exit
+                1. Edit playlist
+                2. Share playlist
+                3. Play song
+                4. Buy song
+                Option:\s""");
+        int operation = sc.nextInt();
+        switch (operation)  {
+            case 1 -> editPlayist();
+            case 2 -> sharePlaylist();
+            case 3 -> playSong();
+            case 4 -> buySong();
+            default -> System.out.println("\nEnter a valid option");
+        }
+    }
+    public void showStatisticsMenu() {
+        System.out.print("""
+                \nSelect the operation
+                0. Exit
+                1. Edit playlist
+                2. Share playlist
+                3. Play song
+                4. Buy song
+                Option:\s""");
+        int operation = sc.nextInt();
+        switch (operation)  {
+            case 1 -> showTotalPlaysPerType();
+            case 2 -> showMostPlayedSongGenre();
+            case 3 -> showMostPlayedPodcastCategory();
+            case 4 -> showProducersTopInfo();
+            case 5 -> showSongsTopInfo();
+            case 6 -> showTotalSalesPerGenre();
+            case 7 -> showBestSellerInfo();
+            default -> System.out.println("\nEnter a valid option");
+        }
+    }
+
+    // REGISTRATION
+
+    public void registerProducer() {
+        String name, pictureUrl;
+        System.out.print("""
+                \nEnter the producer type
+                1. Artist
+                2. Content creator
+                Option:\s""");
+        int type = sc.nextInt();
+        System.out.print("""
+                \nEnter the following information for the new Producer:
+                Format: [name] , [pictureUrl]
+                Example: "The Score , theScore.jpg"
+                Information:\s""");
+        sc.nextLine();
+        String[] info = sc.nextLine().split(" , ");
 
         try {
-            // Registering producers
-            controller.registerProducer(ARTIST_ID,"premiumProducer1", "thisIsAPicture1");
-            controller.registerProducer(ARTIST_ID,"standardProducer1", "thisIsAPicture1");
-            controller.registerProducer(CONTENT_CREATOR_ID,"premiumProducer2", "thisIsAPicture2");
-            controller.registerProducer(CONTENT_CREATOR_ID, "standardProducer2", "thisIsAPicture2" );
-
-            // Registering consumers
-            controller.registerConsumer(STANDARD_ID, "standardConsumer1", "1234567890");
-            controller.registerConsumer(PREMIUM_ID, "premiumConsumer1", "987654321");
-            controller.registerConsumer(PREMIUM_ID, "premiumConsumer2", "987654321");
-
-            // Displaying information
-            System.out.println(controller.showUserInformation(PRODUCER_ID, "premiumProducer1"));
-            System.out.println(controller.showUserInformation(CONSUMER_ID, "premiumProducer1"));
-            System.out.println(controller.showUserInformation(CONSUMER_ID, "premiumConsumer1"));
-            System.out.println(controller.showUserInformation(PRODUCER_ID, "premiumConsumer1"));
-
-            // Registration
-
-            controller.registerPodcast("podcastName1", "picture1", podcastDuration , 1, "this is a description", "premiumProducer2");
-            controller.registerPodcast("podcastName3", "picture1", podcastDuration , 1, "this is a description", "premiumProducer2");
-            controller.registerPodcast("podcastName2", "picture1", podcastDuration , 1, "this is a description", "premiumProducer1");
-            controller.registerSong("songName1", "picture1", songDuration, 3, "album1", 4.5, "standardProducer1");
-
-            // Showing catalogue
-            System.out.println(controller.showCatalogue());
-
-            // Registering playlist
-            for(int i=0; i<1; i++) {
-                controller.registerPlaylist("standardConsumer1", 2, "podcasts1");
-                controller.registerPlaylist("standardConsumer1", 1, "default1");
-                controller.registerPlaylist("standardConsumer1", 3, "songs1");
-            }
-            for(int i=0; i<1; i++) {
-                controller.registerPlaylist("premiumConsumer2", 2, "podcasts1");
-                controller.registerPlaylist("premiumConsumer2", 1, "default1");
-                controller.registerPlaylist("premiumConsumer3", 3, "songs1");
-            }
-
-            // Show playlists
-            System.out.println(controller.showConsumerPlaylists("standardConsumer1"));
-            System.out.println(controller.showConsumerPlaylists("premiumConsumer2"));
-
-            String flag = controller.searchConsumer("standardConsumer1").getPlaylists().get(0).getId();
-            controller.addOrRemoveAudioToPlaylist(1,"standardConsumer1","songName1",flag);
-            System.out.println(controller.showConsumerPlaylists("standardConsumer1"));
-            controller.renamePlaylist(flag, "newPlaylistName");
-            controller.addOrRemoveAudioToPlaylist(2,"standardConsumer1","songName1",flag);
-            System.out.println(controller.showConsumerPlaylists("standardConsumer1"));
-
-            System.out.println(controller.sharePlaylist("standardConsumer1", flag));
-
-            for(String audio : controller.playAudio("standardConsumer1", "podcastName1")) {
-                if(audio != null) System.out.println(audio + "\nPress enter to play the next Song");
-            }
-            System.out.println(controller.showConsumerPlaybacks("standardConsumer1"));
-
-            controller.buySong("standardConsumer1", "songName1");
-            System.out.println(controller.showPurchases());
-
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
+            // parsing
+            name = info[0]; pictureUrl = info[1];
+        } catch (Exception e) {
+            System.out.println("\nEnter the information in a valid format");
+            return;
         }
 
+        switch (type) {
+            case 1 -> controller.registerArtist(name, pictureUrl);
+            case 2 -> controller.registerContentCreator(name, pictureUrl);
+        }
 
+        System.out.println("\nProducer registered successfully");
+        System.out.println(controller.showProducers());
+    }
+    public void registerConsumer() {
+        String name, documentId;
+        System.out.print("""
+                \nEnter the producer type
+                1. Standard consumer
+                2. Premium Consumer
+                Option:\s""");
+        int type = sc.nextInt();
+        System.out.print("""
+                \nEnter the following information for the new Producer:
+                Format: [name] , [documentId]
+                Example: "Yuluka , 1251960801"
+                Information:\s""");
+        sc.nextLine();
+        String[] info = sc.nextLine().split(" , ");
 
+        try {
+            // parsing
+            name = info[0]; documentId = info[1];
+        } catch (Exception e) {
+            System.out.println("\nEnter the information in a valid format");
+            return;
+        }
+
+        switch (type) {
+            case 1 -> controller.registerStandardConsumer(name, documentId);
+            case 2 -> controller.registerPremiumConsumer(name, documentId);
+        }
+
+        System.out.println("\nConsumer registered successfully");
+        System.out.println(controller.showConsumers());
+    }
+    public void registerAudio() {
+        try {
+            String[] info;
+            String name, pictureUrl, duration;
+
+            System.out.print("""
+                    \nEnter the producer type
+                    1. Song
+                    2. Podcast
+                    Option:\s""");
+            int type = sc.nextInt();
+
+            System.out.print("""
+                    \nEnter the following information for the new Audio:
+                    Format: [name] , [pictureUrl] , [duration]
+                    Example: "Bones , bones.jpg , 3:15"
+                    Information:\s""");
+            sc.nextLine();
+            info = sc.nextLine().split(" , ");
+
+            // parsing
+            name = info[0];
+            pictureUrl = info[1];
+            duration = info[2];
+            switch (type) {
+                case 1:
+                    String album, artistName;
+                    int genre;
+                    double saleValue;
+                    System.out.print(String.format("""
+                            \nEnter the following information for the new Song:
+                            Format: [album] , [genre: %s] , [saleValue]
+                            Example: "Mercury , 1 , 25.3"
+                            Information:\s""", controller.showSongGenres()));
+                    info = sc.nextLine().split(" , ");
+
+                    // parsing
+                    album = info[0];
+                    genre = Integer.parseInt(info[1]);
+                    saleValue = Double.parseDouble(info[2]);
+
+                    System.out.println("""
+                            \nEnter the producer name
+                            Info:\s""");
+                    artistName = sc.nextLine();
+
+                    controller.registerSong(name, pictureUrl, duration, genre, album, saleValue, artistName);
+                    break;
+                case 2:
+                    String description, contentCreatorName;
+                    int category;
+                    System.out.print(String.format("""
+                            \nEnter the following information for the new Podcast:
+                            Format: [description] , [category: %s]
+                            Example: "Mercury , 1 , 25.3"
+                            Information:\s""", controller.showPodcastCategories()));
+                    info = sc.nextLine().split(" , ");
+
+                    // parsing
+                    description = info[0];
+                    category = Integer.parseInt(info[1]);
+
+                    System.out.println(String.format("""
+                            \nEnter the producer name
+                            Info:\s""", controller.showProducers()));
+                    contentCreatorName = sc.nextLine();
+
+                    controller.registerPodcast(name, pictureUrl, duration, category, description, contentCreatorName);
+
+                    break;
+                default:
+                    System.out.println("Enter a valid option");
+                    return;
+            }
+        } catch(Exception e) {
+            System.out.println("Error, check the input format and be sure that the producer exists");
+        }
+    }
+    public void registerPlaylist() {
 
     }
+
+    // INTERACTION
+
+    public void editPlayist() {
+
+    }
+    public void sharePlaylist() {
+
+    }
+    public void playSong() {
+
+    }
+    public void buySong() {
+
+    }
+
+    // STATISTICS
+
+    public void showTotalPlaysPerType() {
+
+    }
+    public void showMostPlayedSongGenre() {
+
+    }
+    public void showMostPlayedPodcastCategory() {
+
+    }
+    public void showProducersTopInfo() {
+
+    }
+    public void showSongsTopInfo() {
+
+    }
+    public void showTotalSalesPerGenre() {
+
+    }
+    public void showBestSellerInfo() {
+
+    }
+
 }

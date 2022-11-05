@@ -29,6 +29,25 @@ public class ContentCreator extends Producer {
         podcasts.add( (Podcast) newAudio );
     }
 
+
+    @Override
+    public int getTotalPlays() {
+        int totalPlays = 0;
+        for(Podcast podcast : podcasts) {
+            totalPlays += podcast.getNumberOfPlays();
+        }
+        return totalPlays;
+    }
+
+    @Override
+    public int getTotalTimePlayed() {
+        int totalTimePlayed = 0;
+        for(Podcast podcast : podcasts) {
+            totalTimePlayed += podcast.getDuration();
+        }
+        return totalTimePlayed;
+    }
+
     @Override
     public Audio searchAudio(String name) {
         for(Podcast podcast : podcasts) {

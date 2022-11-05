@@ -3,15 +3,11 @@ package model;
 public abstract class Producer extends User {
     private String name;
     private String pictureUrl;
-    private int NumberOfPlays;
-    private int TimePlayed;
 
     public Producer(String name, String pictureUrl) {
         super();
         this.name = name;
         this.pictureUrl = pictureUrl;
-        this.NumberOfPlays = 0;
-        this.TimePlayed = 0;
     }
 
     public String getName() {
@@ -30,27 +26,15 @@ public abstract class Producer extends User {
         this.pictureUrl = pictureUrl;
     }
 
-    public int getNumberOfPlays() {
-        return NumberOfPlays;
-    }
-
-    public void setNumberOfPlays(int numberOfPlays) {
-        NumberOfPlays = numberOfPlays;
-    }
-
-    public int getTimePlayed() {
-        return TimePlayed;
-    }
-
-    public void setTimePlayed(int timePlayed) {
-        TimePlayed = timePlayed;
-    }
-
     public abstract String showAudios();
 
     public abstract void addAudio(Audio newAudio);
 
     public abstract Audio searchAudio(String name);
+
+    public abstract int getTotalPlays();
+
+    public abstract int getTotalTimePlayed();
 
     @Override
     public String toString() {
@@ -58,8 +42,8 @@ public abstract class Producer extends User {
                 "name='" + name + '\'' +
                 ", joiningDate='" + super.getJoiningDate() + '\'' +
                 ", pictureUrl='" + pictureUrl + '\'' +
-                ", NumberOfPlays=" + NumberOfPlays +
-                ", TimePlayed=" + TimePlayed +
+                ", NumberOfPlays=" + getTotalPlays() +
+                ", TimePlayed=" + getTotalTimePlayed() +
                 '}';
     }
 }

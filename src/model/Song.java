@@ -67,8 +67,12 @@ public class Song extends Audio {
         return numberOfSales;
     }
 
-    public void setNumberOfSales(int numberOfSales) {
-        this.numberOfSales = numberOfSales;
+    public void increaseNumberOfSales() {
+        this.numberOfSales++;
+    }
+
+    public double getTotalIncome() {
+        return numberOfSales * saleValue;
     }
 
     @Override

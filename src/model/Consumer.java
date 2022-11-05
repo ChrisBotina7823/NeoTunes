@@ -93,6 +93,45 @@ public abstract class Consumer extends User {
         tmpAudio.increaseNumberOfPlays();
     }
 
+    public int[] mostPlayedSongGenre() {
+        int[] playsPerSongType = countPlaysPerAudioType()[0];
+        int maxGenre = 0;
+        for(int i=0; i<playsPerSongType.length; i++) {
+            if(playsPerSongType[i] > playsPerSongType[maxGenre]) maxGenre = i;
+        }
+        return new int[]{maxGenre, playsPerSongType[maxGenre]};
+    }
+    public int[] mostPlayedPodcastCategory() {
+        int[] playsPerPodcastCategory = countPlaysPerAudioType()[1];
+        int maxCategory = 0;
+        for(int i=0; i<playsPerPodcastCategory.length; i++) {
+            if(playsPerPodcastCategory[i] > playsPerPodcastCategory[maxCategory]) maxCategory = i;
+        }
+        return new int[]{maxCategory, playsPerPodcastCategory[maxCategory]};
+    }
+
+    public int[][] countPlaysPerAudioType() {
+        int[] playsPerSongGenre = new int[SongGenre.values().length];
+        int[] playsPerPodcastCategory = new int[PodcastCategory.values().length];
+        for(Record playback : playbacks) {
+            if(playback.getAudio() instanceof Song) {
+                for(int i=0; i<SongGenre.values().length; i++) {
+                    if(((Song) playback.getAudio()).getGenre() == SongGenre.values()[i]) {
+                        playsPerSongGenre[i]++;
+                    }
+                }
+            } else if(playback.getAudio() instanceof Podcast) {
+                for(int i=0; i<PodcastCategory.values().length; i++) {
+                    if(((Podcast) playback.getAudio()).getCategory() == PodcastCategory.values()[i]) {
+                        playsPerPodcastCategory[i]++;
+                    }
+                }
+            }
+
+        }
+        return new int[][]{playsPerSongGenre, playsPerPodcastCategory};
+    }
+
     @Override
     public String toString() {
         return "Consumer{" +

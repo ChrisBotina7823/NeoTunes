@@ -24,6 +24,24 @@ public class Artist extends Producer {
     }
 
     @Override
+    public int getTotalPlays() {
+        int totalPlays = 0;
+        for(Song song: songs) {
+            totalPlays += song.getNumberOfPlays();
+        }
+        return totalPlays;
+    }
+
+    @Override
+    public int getTotalTimePlayed() {
+        int totalTimePlayed = 0;
+        for(Song song : songs) {
+            totalTimePlayed += song.getDuration();
+        }
+        return totalTimePlayed;
+    }
+
+    @Override
     public String showAudios() {
         String songList = "";
 

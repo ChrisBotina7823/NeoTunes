@@ -22,7 +22,6 @@ public class PodcastPlaylist extends Playlist {
         setId(newId);
     }
 
-
     @Override
     public boolean addAudio(Audio newAudio) {
         if( !(newAudio instanceof Podcast) || searchAudio(newAudio) != null) return false;

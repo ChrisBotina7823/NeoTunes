@@ -17,7 +17,9 @@ public class PremiumConsumer extends Consumer {
     @Override
     public boolean addSong(Song newSong) {
         if(searchSong(newSong.getName()) != null) return false;
-        return getSongs().add(newSong);
+        getSongs().add(newSong);
+        newSong.increaseNumberOfSales();
+        return true;
     }
 
 }
