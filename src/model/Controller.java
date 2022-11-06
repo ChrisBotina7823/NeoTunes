@@ -5,22 +5,21 @@ import java.util.Collections;
 import java.util.Random;
 
 public class Controller {
-    private ArrayList<Producer> producers;
-    private ArrayList<Consumer> consumers;
+    private ArrayList<User> users;
     private ArrayList<Playlist> playlists;
 
     private ArrayList<Audio> catalogue;
     private ArrayList<Record> purchases;
 
     private final Advertisement[] ADS = {
-            new Advertisement("Nike - Just Do It", "picture", 10),
-            new Advertisement("Coca-Cola - Open Happiness", "picture", 10),
-            new Advertisement("M&Ms - Melts in your Mouth, not in your hands", "picture", 10),
+            new Advertisement("Nike", "Just Do It", "picture", 10),
+            new Advertisement("Coca-Cola", "Open Happiness", "picture", 10),
+            new Advertisement("M&Ms", "Melts in your Mouth, not in your hands", "picture", 10),
     };
 
     public Controller() {
-        this.producers = new ArrayList<>();
-        this.consumers = new ArrayList<>();
+        this.users = new ArrayList<>();
+        this.users = new ArrayList<>();
         this.playlists = new ArrayList<>();
         this.purchases = new ArrayList<>();
         this.catalogue = new ArrayList<>();
@@ -28,32 +27,32 @@ public class Controller {
 
     // REGISTRATION METHODS
 
-    public void registerContentCreator(String name, String pictureUrl) {
-        if(searchProducer(name) != null) throw new IllegalArgumentException("Content creator is already in list");
-        ContentCreator newContentCreator = new ContentCreator(name, pictureUrl);
-        producers.add(newContentCreator);
+    public void registerContentCreator(String name, String documentId, String pictureUrl) {
+        if(searchUser(documentId) != null) throw new IllegalArgumentException("Content creator is already in list");
+        ContentCreator newContentCreator = new ContentCreator(name, documentId, pictureUrl);
+        users.add(newContentCreator);
     }
-    public void registerArtist(String name, String pictureUrl) {
-        if(searchProducer(name) != null) throw new IllegalArgumentException("Content creator is already in list");
-        Artist newArtist = new Artist(name, pictureUrl);
-        producers.add(newArtist);
+    public void registerArtist(String name, String documentId, String pictureUrl) {
+        if(searchUser(documentId) != null) throw new IllegalArgumentException("Artist is already in list");
+        Artist newArtist = new Artist(name, documentId, pictureUrl);
+        users.add(newArtist);
     }
 
     public void registerStandardConsumer(String nickname, String documentId) {
-        if(searchConsumer(nickname) != null) throw new IllegalArgumentException("Content creator is already in list");
+        if(searchUser(documentId) != null) throw new IllegalArgumentException("Consumer is already in list");
         StandardConsumer newStandardConsumer = new StandardConsumer(nickname, documentId);
-        consumers.add(newStandardConsumer);
+        users.add(newStandardConsumer);
     }
     public void registerPremiumConsumer(String nickname, String documentId) {
-        if(searchConsumer(nickname) != null) throw new IllegalArgumentException("Content creator is already in list");
+        if(searchUser(documentId) != null) throw new IllegalArgumentException("Consumer is already in list");
         PremiumConsumer newPremiumConsumer = new PremiumConsumer(nickname, documentId);
-        consumers.add(newPremiumConsumer);
+        users.add(newPremiumConsumer);
     }
 
-    public void registerSong(String songName, String pictureUrl, String duration, int genre, String album, double saleValue, String artistName) {
+    public void registerSong(String songName, String pictureUrl, String duration, int genre, String album, double saleValue, String artistId) {
 
-        Song newSong = new Song(songName, pictureUrl, parseDuration(duration), genre, album, saleValue);
-        Producer foundProducer = searchProducer(artistName);
+        Song newSong = new Song(artistId, songName, pictureUrl, parseDuration(duration), genre, album, saleValue);
+        Producer foundProducer = (Producer)searchUser(artistId);
 
         if(foundProducer == null) throw new IllegalArgumentException("Producer not found");
 
@@ -61,12 +60,12 @@ public class Controller {
         catalogue.add(newSong);
     }
 
-    public boolean registerPodcast(String podcastName, String pictureUrl, String duration, int category, String description, String contentCreatorName) {
+    public boolean registerPodcast(String podcastName, String pictureUrl, String duration, int category, String description, String contentCreatorId) {
 
-        Podcast newPodcast = new Podcast(podcastName, pictureUrl, parseDuration(duration), category, description);
-        Producer foundProducer = searchProducer(contentCreatorName);
+        Podcast newPodcast = new Podcast(contentCreatorId, podcastName, pictureUrl, parseDuration(duration), category, description);
+        Producer foundProducer = (Producer)searchUser(contentCreatorId);
 
-        if( foundProducer == null || !(foundProducer instanceof ContentCreator) ) return false;
+        if( foundProducer == null || !(foundProducer instanceof ContentCreator) ) throw new IllegalArgumentException("Producer not found");
 
         foundProducer.addAudio(newPodcast);
         catalogue.add(newPodcast);
@@ -88,7 +87,7 @@ public class Controller {
                 break;
         }
 
-        Consumer tmpConsumer = searchConsumer(consumerName);
+        Consumer tmpConsumer = (Consumer)searchUser(consumerName);
         if(tmpConsumer == null) return false;
 
         if(tmpConsumer.addPlaylist(newPlaylist)) {
@@ -109,7 +108,7 @@ public class Controller {
     }
 
     public boolean addOrRemoveAudioToPlaylist(int operation, String consumerName, String audioName, String playlistId) {
-        Consumer tmpConsumer = searchConsumer(consumerName);
+        Consumer tmpConsumer = (Consumer)searchUser(consumerName);
         if(tmpConsumer == null) return false;
         Playlist tmpPlaylist = tmpConsumer.searchPlaylist(playlistId);
         if(tmpPlaylist == null) return false;
@@ -119,7 +118,7 @@ public class Controller {
     }
 
     public String sharePlaylist(String consumerName, String playlistId) {
-        Consumer tmpConsumer = searchConsumer(consumerName);
+        Consumer tmpConsumer = (Consumer)searchUser(consumerName);
         if(tmpConsumer == null) return "User not found";
         Playlist tmpPlaylist = searchPlaylist(playlistId);
         if(tmpPlaylist == null) return "User does not have the playlist";
@@ -143,36 +142,39 @@ public class Controller {
         return categoriesList;
     }
 
-    public String showProducers() {
-        String producerList = "";
-        for(Producer producer : producers) producerList += "\n - " + producer.getName() + ((producer instanceof Artist) ? " (Artist)" : " (Content creator)");
-        return (producerList.equals("")) ? ("") : ("--- Producer list ---" + producerList);
-    }
-
-    public String showConsumers() {
-        String consumerList = "";
-        for(Consumer consumer : consumers) consumerList += "\n - " + consumer.getNickname() + ((consumer instanceof StandardConsumer) ? (" (Standard)")  : (" (Premium"));
-        return (consumerList.equals("")) ? ("") : ("--- Consumer list ---" + consumerList);
+    public String showUsers(int type) {
+        String userList = "";
+        for(User user : users) {
+            switch (type) {
+                case 0:
+                    userList += "\n - " + ( (user instanceof Producer) ? (((Producer) user).getName() + " (Producer) ") : (((Consumer)user).getNickname() + " (Consumer) ") );
+                    break;
+                case 1:
+                    if(user instanceof Producer) userList += "\n - " + ((Producer)user).getName() + ((user instanceof Artist) ? " (Artist)" : " (Content creator)");
+                    break;
+                case 2:
+                    if(user instanceof Consumer) userList += "\n - " + ((Consumer)user).getNickname() + ((user instanceof StandardConsumer) ? (" (Standard)")  : (" (Premium)"));
+            }
+        }
+        return (type == 1) ? ("--- Producer list ---" + userList) : ("--- Consumer list ---" + userList);
     }
 
     public String showCatalogue() {
-        String catalogue = "";
+        String catalogueList = "";
 
-        for(Producer producer : producers) {
-            if(producer.showAudios().equals("")) continue;
-            if(producer instanceof Artist) catalogue += producer.showAudios();
-            if(producer instanceof ContentCreator) catalogue += producer.showAudios();
+        for(Audio audio : catalogue) {
+            catalogueList += "\n - " + audio.getName() + " by " + audio.getProducerName();
         }
-        return ( catalogue.equals("") ) ? ("") : ("\n--- Current Catalogue --- " ) + catalogue;
+        return ( catalogueList.equals("") ) ? ("") : ("\n--- Current Catalogue --- " ) + catalogueList;
     }
 
     public String showUserInformation(int userType, String name) {
         switch (userType) {
             case 1:
-                Producer foundProducer = searchProducer(name);
+                Producer foundProducer = (Producer)searchUser(name);
                 return (foundProducer != null) ? foundProducer.toString() : "Producer not found";
             case 2:
-                Consumer foundConsumer = searchConsumer(name);
+                Consumer foundConsumer = (Consumer)searchUser(name);
                 return (foundConsumer != null) ? foundConsumer.toString() : "Consumer not found";
             default:
                 return "";
@@ -180,7 +182,7 @@ public class Controller {
     }
 
     public String showConsumerPlaylists(String consumerName) {
-        Consumer matchedConsumer = searchConsumer(consumerName);
+        Consumer matchedConsumer = (Consumer)searchUser(consumerName);
         if(matchedConsumer == null) return "Consumer not found";
 
         return matchedConsumer.showPlaylists();
@@ -195,23 +197,16 @@ public class Controller {
     }
 
     public String showConsumerPlaybacks(String consumerName) {
-        Consumer tmpConsumer = searchConsumer(consumerName);
+        Consumer tmpConsumer = (Consumer)searchUser(consumerName);
         if(tmpConsumer == null) return "Consumer not found";
         return tmpConsumer.showPlaybacks();
     }
 
     // SEARCHING METHODS
 
-    public Producer searchProducer(String name) {
-        for(Producer producer : producers) {
-            if(producer.getName().equals(name)) return producer;
-        }
-        return null;
-    }
-
-    public Consumer searchConsumer(String name) {
-        for(Consumer consumer : consumers) {
-            if(consumer.getNickname().equals(name)) return consumer;
+    public User searchUser(String documentId) {
+        for(User user : users) {
+            if(user.getDocumentId().equals(documentId)) return user;
         }
         return null;
     }
@@ -224,23 +219,23 @@ public class Controller {
     }
 
     public Audio searchAudio(String audioName) {
-        for(Producer producer : producers) {
-            Audio tmpAudio = producer.searchAudio(audioName);
-            if(tmpAudio != null) return tmpAudio;
+        for(Audio audio : catalogue) {
+            if(audio.getName().equals(audioName)) return audio;
         }
         return null;
     }
 
     // PLAYING
 
-    public String[] playAudio(String consumerName, String audioName) {
+    public String[] playAudio(String consumerId, String audioName) {
         String[] audioList = new String[2];
         Random rnd = new Random();
         Advertisement advertisement = ADS[rnd.nextInt(ADS.length-1)];
 
-        Consumer tmpConsumer = searchConsumer(consumerName);
+        Consumer tmpConsumer = (Consumer)searchUser(consumerId);
+
         Audio tmpAudio = searchAudio(audioName);
-        if(tmpConsumer == null || tmpAudio == null) return audioList;
+        if(tmpConsumer == null || tmpAudio == null) throw new IllegalArgumentException("Consumer or audio not found");
 
         tmpConsumer.playAudio(tmpAudio);
         if(tmpConsumer instanceof Advertisable) {
@@ -253,22 +248,22 @@ public class Controller {
     }
 
     // BUYING
-    public boolean buySong(String consumerName, String songName) {
-        Consumer tmpConsumer = searchConsumer(consumerName);
+    public boolean buySong(String consumerId, String songName) {
+        Consumer tmpConsumer = (Consumer)searchUser(consumerId);
         Audio tmpAudio = searchAudio(songName);
         if(tmpConsumer == null || tmpAudio == null || !(tmpAudio instanceof Song)) return false;
 
         if(tmpConsumer.addSong((Song)tmpAudio)) {
-            purchases.add(new Record(consumerName, tmpAudio));
+            purchases.add(new Record(tmpConsumer.getNickname(), tmpAudio));
         }
         return true;
     }
 
     // STATISTICS
 
-    public String usersMostPlayedSongGenre(String consumerName) {
+    public String usersMostPlayedSongGenre(String consumerId) {
         String statistics = "";
-        Consumer tmpConsumer = searchConsumer(consumerName);
+        Consumer tmpConsumer = (Consumer)searchUser(consumerId);
         if(tmpConsumer == null) return "not found";
 
         int[] maxSong = tmpConsumer.mostPlayedSongGenre();
@@ -276,9 +271,9 @@ public class Controller {
         statistics += String.format("For user %s: %nMost played song genre: %s (%d plays)", tmpConsumer.getNickname(), SongGenre.values()[maxSong[0]], maxSong[1]);
         return statistics;
     }
-    public String usersMostPlayedPodcastCategory(String consumerName) {
+    public String usersMostPlayedPodcastCategory(String consumerId) {
         String statistics = "";
-        Consumer tmpConsumer = searchConsumer(consumerName);
+        Consumer tmpConsumer = (Consumer)searchUser(consumerId);
         if(tmpConsumer == null) return "not found";
 
         int[] maxPodcast = tmpConsumer.mostPlayedPodcastCategory();
@@ -345,9 +340,9 @@ public class Controller {
     }
 
     public void sortProducers() {
-        for(int i=0; i<producers.size(); i++) {
-            for(int j=1; j<producers.size()-i; j++) {
-                if(producers.get(j-1).getTotalPlays() < producers.get(j).getTotalPlays()) Collections.swap(producers, j, j-1);
+        for(int i = 0; i< users.size(); i++) {
+            for(int j = 1; j< users.size()-i; j++) {
+                if((users.get(j) instanceof Producer && users.get(j-1) instanceof Producer) || ((Producer)users.get(j-1)).getTotalPlays() < ((Producer)users.get(j)).getTotalPlays()) Collections.swap(users, j, j-1);
             }
         }
     }
@@ -362,14 +357,14 @@ public class Controller {
     public String showProducersTop(int limit) {
         String artistTop = "", contentCreatorTop = "";
         sortProducers();
-        if(producers.size() < limit*2) return String.format("There must be at least %d producers of each type", limit);
+        if(users.size() < limit*2) return String.format("There must be at least %d producers of each type", limit);
         for(int i=0, ccIndex = 1, aIndex = 1; i<limit*2; i++) {
-            if(producers.get(i) instanceof Artist) {
-                artistTop += String.format("%n %d. %s (%d plays)", aIndex, producers.get(i).getName(), producers.get(i).getTotalPlays());
+            if(users.get(i) instanceof Artist) {
+                artistTop += String.format("%n %d. %s (%d plays)", aIndex, ((Producer)users.get(i)).getName(), ((Producer)users.get(i)).getTotalPlays());
                 aIndex++;
             }
-            if(producers.get(i) instanceof ContentCreator) {
-                contentCreatorTop += String.format("%n %d. %s (%d plays)", ccIndex, producers.get(i).getName(), producers.get(i).getTotalPlays());
+            if(users.get(i) instanceof ContentCreator) {
+                contentCreatorTop += String.format("%n %d. %s (%d plays)", ccIndex, ((Producer)users.get(i)).getName(), ((Producer)users.get(i)).getTotalPlays());
                 ccIndex++;
             }
         }

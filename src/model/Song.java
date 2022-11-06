@@ -10,8 +10,8 @@ public class Song extends Audio {
 
     private LocalDate purchaseDate;
 
-    public Song(String name, String pictureUrl,int duration, int genre, String album, double saleValue) {
-        super(name, pictureUrl, duration);
+    public Song(String producerId, String name, String pictureUrl,int duration, int genre, String album, double saleValue) {
+        super(name, pictureUrl, duration, producerId);
 
         if(genre < 0 || genre >= SongGenre.values().length) {
             String msg = "Select a genre within the range (1 to " + SongGenre.values().length + ")";

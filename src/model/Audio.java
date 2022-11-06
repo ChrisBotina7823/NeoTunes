@@ -8,11 +8,14 @@ public abstract class Audio {
     private int numberOfPlays;
     private int duration;
 
-    public Audio(String name, String pictureUrl, int duration) {
+    private String producerId;
+
+    public Audio(String name, String pictureUrl, int duration, String producerId) {
         this.name = name;
         this.numberOfPlays = 0;
         this.pictureUrl = pictureUrl;
         this.duration = duration;
+        this.producerId = producerId;
     }
 
     public String getName() {
@@ -46,6 +49,15 @@ public abstract class Audio {
     public void setDuration(int duration) {
         this.duration = duration;
     }
+
+    public String getProducerName() {
+        return producerId;
+    }
+
+    public void setProducerName(String producerId) {
+        this.producerId = producerId;
+    }
+
     public void increaseNumberOfPlays() {
         this.numberOfPlays++;
     }

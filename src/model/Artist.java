@@ -1,23 +1,19 @@
 package model;
 
-import java.util.ArrayList;
-
 public class Artist extends Producer {
-    private ArrayList<Song> songs;
 
-    public Artist(String name, String pictureUrl) {
-        super(name, pictureUrl);
-        this.songs = new ArrayList<Song>();
+    public Artist(String name, String documentId, String pictureUrl) {
+        super(name, documentId, pictureUrl);
     }
 
     @Override
     public void addAudio(Audio newAudio) {
-        songs.add( (Song) newAudio );
+        getAudios().add( (Audio) newAudio );
     }
 
     @Override
     public Audio searchAudio(String name) {
-        for(Song song : songs) {
+        for(Audio song : getAudios()) {
             if(song.getName().equals(name)) return song;
         }
         return null;
@@ -26,7 +22,7 @@ public class Artist extends Producer {
     @Override
     public int getTotalPlays() {
         int totalPlays = 0;
-        for(Song song: songs) {
+        for(Audio song: getAudios()) {
             totalPlays += song.getNumberOfPlays();
         }
         return totalPlays;
@@ -35,7 +31,7 @@ public class Artist extends Producer {
     @Override
     public int getTotalTimePlayed() {
         int totalTimePlayed = 0;
-        for(Song song : songs) {
+        for(Audio song : getAudios()) {
             totalTimePlayed += song.getDuration();
         }
         return totalTimePlayed;
@@ -45,7 +41,7 @@ public class Artist extends Producer {
     public String showAudios() {
         String songList = "";
 
-        for(Song song : songs) {
+        for(Audio song : getAudios()) {
             songList += "\n - " + song.getName() + " by " + this.getName();
         }
 

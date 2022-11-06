@@ -1,14 +1,9 @@
 package model;
 
-
-import java.util.ArrayList;
-
 public class ContentCreator extends Producer {
-    private ArrayList<Podcast> podcasts;
 
-    public ContentCreator(String name, String pictureUrl) {
-        super(name, pictureUrl);
-        this.podcasts = new ArrayList<>();
+    public ContentCreator(String name, String documentId, String pictureUrl) {
+        super(name, documentId, pictureUrl);
     }
 
 
@@ -17,7 +12,7 @@ public class ContentCreator extends Producer {
     public String showAudios() {
         String podcastList = "";
 
-        for(Podcast podcast : podcasts) {
+        for(Audio podcast : getAudios()) {
             podcastList += "\n - " + podcast.getName() + " by " + this.getName();
         }
 
@@ -26,14 +21,14 @@ public class ContentCreator extends Producer {
 
     @Override
     public void addAudio(Audio newAudio) {
-        podcasts.add( (Podcast) newAudio );
+        getAudios().add( (Audio) newAudio );
     }
 
 
     @Override
     public int getTotalPlays() {
         int totalPlays = 0;
-        for(Podcast podcast : podcasts) {
+        for(Audio podcast : getAudios()) {
             totalPlays += podcast.getNumberOfPlays();
         }
         return totalPlays;
@@ -42,7 +37,7 @@ public class ContentCreator extends Producer {
     @Override
     public int getTotalTimePlayed() {
         int totalTimePlayed = 0;
-        for(Podcast podcast : podcasts) {
+        for(Audio podcast : getAudios()) {
             totalTimePlayed += podcast.getDuration();
         }
         return totalTimePlayed;
@@ -50,7 +45,7 @@ public class ContentCreator extends Producer {
 
     @Override
     public Audio searchAudio(String name) {
-        for(Podcast podcast : podcasts) {
+        for(Audio podcast : getAudios()) {
             if(podcast.getName().equals(name)) return podcast;
         }
         return null;

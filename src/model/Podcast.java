@@ -6,8 +6,8 @@ public class Podcast extends Audio {
     private PodcastCategory category;
     private String description;
 
-    public Podcast(String name, String pictureUrl, int duration, int category, String description) {
-        super(name, pictureUrl, duration);
+    public Podcast(String producerId, String name, String pictureUrl, int duration, int category, String description) {
+        super(name, pictureUrl, duration, producerId);
         if(category < 0 || category >= PodcastCategory.values().length) {
             String msg = "Select a category within the range (1 to " + PodcastCategory.values().length + ")";
             throw new IllegalArgumentException(msg);

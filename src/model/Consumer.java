@@ -4,14 +4,13 @@ import java.util.ArrayList;
 
 public abstract class Consumer extends User {
     private String nickname;
-    private String documentId;
     private ArrayList<Song> songs;
     private ArrayList<Playlist> playlists;
     private ArrayList<Record> playbacks;
 
     public Consumer(String nickname, String documentId) {
+        super(documentId);
         this.nickname = nickname;
-        this.documentId = documentId;
         this.songs = new ArrayList<>();
         this.playlists = new ArrayList<>();
         this.playbacks = new ArrayList<>();
@@ -25,14 +24,6 @@ public abstract class Consumer extends User {
 
     public void setNickname(String nickname) {
         this.nickname = nickname;
-    }
-
-    public String getDocumentId() {
-        return documentId;
-    }
-
-    public void setDocumentId(String documentId) {
-        this.documentId = documentId;
     }
 
     public ArrayList<Song> getSongs() {
@@ -136,8 +127,8 @@ public abstract class Consumer extends User {
     public String toString() {
         return "Consumer{" +
                 "nickname='" + nickname + '\'' +
-                ", joiningDate='" + super.getJoiningDate() + '\'' +
-                ", documentId='" + documentId + '\'' +
+                ", joiningDate='" + getJoiningDate() + '\'' +
+                ", documentId='" + getDocumentId() + '\'' +
                 '}';
     }
 }
