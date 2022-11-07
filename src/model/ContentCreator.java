@@ -2,11 +2,14 @@ package model;
 
 public class ContentCreator extends Producer {
 
-    public ContentCreator(String name, String documentId, String pictureUrl) {
-        super(name, documentId, pictureUrl);
+    public ContentCreator(String name, String pictureUrl) {
+        super(name, pictureUrl);
     }
 
-
+    @Override
+    public void addAudio(Audio newAudio) {
+        getAudios().add( (Audio) newAudio );
+    }
 
     @Override
     public String showAudios() {
@@ -20,10 +23,12 @@ public class ContentCreator extends Producer {
     }
 
     @Override
-    public void addAudio(Audio newAudio) {
-        getAudios().add( (Audio) newAudio );
+    public Audio searchAudio(String name) {
+        for(Audio podcast : getAudios()) {
+            if(podcast.getName().equals(name)) return podcast;
+        }
+        return null;
     }
-
 
     @Override
     public int getTotalPlays() {
@@ -41,13 +46,5 @@ public class ContentCreator extends Producer {
             totalTimePlayed += podcast.getDuration();
         }
         return totalTimePlayed;
-    }
-
-    @Override
-    public Audio searchAudio(String name) {
-        for(Audio podcast : getAudios()) {
-            if(podcast.getName().equals(name)) return podcast;
-        }
-        return null;
     }
 }

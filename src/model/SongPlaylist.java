@@ -24,8 +24,9 @@ public class SongPlaylist extends Playlist {
     }
 
     @Override
-    public boolean addAudio(Audio newAudio) {
-        if( !(newAudio instanceof Song) || searchAudio(newAudio) != null ) return false;
-        return super.getAudios().add(newAudio);
+    public void addAudio(Audio newAudio) {
+        if(searchAudio(newAudio) != null ) throw new IllegalArgumentException("Audio is already in playlist");
+        if(!(newAudio instanceof Song) ) throw new IllegalArgumentException("This playlist only supports songs");
+        getAudios().add(newAudio);
     }
 }

@@ -2,13 +2,14 @@ package model;
 
 public class Artist extends Producer {
 
-    public Artist(String name, String documentId, String pictureUrl) {
-        super(name, documentId, pictureUrl);
+    public Artist(String name, String pictureUrl) {
+        super(name, pictureUrl);
     }
+
 
     @Override
     public void addAudio(Audio newAudio) {
-        getAudios().add( (Audio) newAudio );
+        getAudios().add( newAudio );
     }
 
     @Override
@@ -17,6 +18,16 @@ public class Artist extends Producer {
             if(song.getName().equals(name)) return song;
         }
         return null;
+    }
+
+    @Override
+    public String showAudios() {
+        String songList = "";
+
+        for(Audio song : getAudios()) {
+            songList += "\n - " + song.getName() + " by " + this.getName();
+        }
+        return songList;
     }
 
     @Override
@@ -35,17 +46,6 @@ public class Artist extends Producer {
             totalTimePlayed += song.getDuration();
         }
         return totalTimePlayed;
-    }
-
-    @Override
-    public String showAudios() {
-        String songList = "";
-
-        for(Audio song : getAudios()) {
-            songList += "\n - " + song.getName() + " by " + this.getName();
-        }
-
-        return songList;
     }
 
 }

@@ -27,94 +27,200 @@ public class Controller {
 
     // REGISTRATION METHODS
 
-    public void registerContentCreator(String name, String documentId, String pictureUrl) {
-        if(searchUser(documentId) != null) throw new IllegalArgumentException("Content creator is already in list");
-        ContentCreator newContentCreator = new ContentCreator(name, documentId, pictureUrl);
+
+    /**
+     * <pre>
+     * <strong>Description: </strong> It adds a new content creator to the users' collection, ensuring that it is not already in it.
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized
+     * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new user in it
+     * @param name new content creator name
+     * @param pictureUrl picture that represents the artist
+     * </pre>
+     */
+    public void registerContentCreator(String name, String pictureUrl) {
+        if(searchUser(name) != null) throw new IllegalArgumentException("Content creator is already in list");
+        ContentCreator newContentCreator = new ContentCreator(name, pictureUrl);
         users.add(newContentCreator);
     }
-    public void registerArtist(String name, String documentId, String pictureUrl) {
-        if(searchUser(documentId) != null) throw new IllegalArgumentException("Artist is already in list");
-        Artist newArtist = new Artist(name, documentId, pictureUrl);
+
+
+    /**
+     * <pre>
+     * <strong>Description: </strong> It adds a new artist to the users' collection, ensuring that it is not already in it.
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized
+     * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new user in it
+     * @param name new artist name
+     * @param pictureUrl picture that represents the artist
+     * </pre>
+     */
+    public void registerArtist(String name, String pictureUrl) {
+        if(searchUser(name) != null) throw new IllegalArgumentException("Artist is already in list");
+        Artist newArtist = new Artist(name, pictureUrl);
         users.add(newArtist);
     }
 
+    /**
+     * <pre>
+     * <strong>Description: </strong> It adds a new standard consumer to the users' collection, ensuring that it is not already in it.
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized
+     * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new user in it
+     * @param nickname new artist name
+     * @param documentId new user's document
+     * </pre>
+     */
     public void registerStandardConsumer(String nickname, String documentId) {
-        if(searchUser(documentId) != null) throw new IllegalArgumentException("Consumer is already in list");
+        if(searchUser(nickname) != null) throw new IllegalArgumentException("Consumer is already in list");
         StandardConsumer newStandardConsumer = new StandardConsumer(nickname, documentId);
         users.add(newStandardConsumer);
     }
+
+    /**
+     * <pre>
+     * <strong>Description: </strong> It adds a new premium consumer to the users' collection, ensuring that it is not already in it.
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized
+     * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new user in it
+     * @param nickname new artist name
+     * @param documentId new user's document
+     * </pre>
+     */
     public void registerPremiumConsumer(String nickname, String documentId) {
-        if(searchUser(documentId) != null) throw new IllegalArgumentException("Consumer is already in list");
+        if(searchUser(nickname) != null) throw new IllegalArgumentException("Consumer is already in list");
         PremiumConsumer newPremiumConsumer = new PremiumConsumer(nickname, documentId);
         users.add(newPremiumConsumer);
     }
 
-    public void registerSong(String songName, String pictureUrl, String duration, int genre, String album, double saleValue, String artistId) {
+    /**
+     * <pre>
+     * <strong>Description: </strong> It adds a new song to the artist's songs collection and in the general catalogue, ensuring that it is not already in it.
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized and have at least one producer
+     * <strong>pre: </strong> catalogue <strong>ArrayList</strong> must be initialized
+     * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new song in it
+     * <strong>pos: </strong> catalogue <strong>ArrayList</strong> modified with a new song in it
+     * @param songName <strong>String</strong> name of the new song
+     * @param pictureUrl <strong>String</strong> url that represents the new song
+     * @param duration <strong>String</strong> duration written in "MM:SS"
+     * @param genre <strong>int</strong> genre number 1.rock, 2.pop, 3.trap, 4.house
+     * @param album <strong>String</strong> name of the album that contains the song
+     * @param saleValue <strong>double</strong> sale value of the song
+     * @param artistName <strong>String</strong> name of the producer to which the song is going to be added.
+     * </pre>
+     */
+    public void registerSong(String songName, String pictureUrl, String duration, int genre, String album, double saleValue, String artistName) {
+        User foundProducer = searchUser(artistName);
+        if(!(foundProducer instanceof Artist)) throw new IllegalArgumentException("Artist not found");
 
-        Song newSong = new Song(artistId, songName, pictureUrl, parseDuration(duration), genre, album, saleValue);
-        Producer foundProducer = (Producer)searchUser(artistId);
+        Song newSong = new Song(((Artist)foundProducer).getName(), songName, pictureUrl, parseDuration(duration), genre, album, saleValue);
+        if(searchAudio(songName) != null) throw new IllegalArgumentException("Song is already in catalogue");
 
-        if(foundProducer == null) throw new IllegalArgumentException("Producer not found");
-
-        foundProducer.addAudio(newSong);
+        ((Artist)foundProducer).addAudio(newSong);
         catalogue.add(newSong);
     }
 
-    public boolean registerPodcast(String podcastName, String pictureUrl, String duration, int category, String description, String contentCreatorId) {
 
-        Podcast newPodcast = new Podcast(contentCreatorId, podcastName, pictureUrl, parseDuration(duration), category, description);
-        Producer foundProducer = (Producer)searchUser(contentCreatorId);
+    /**
+     * <pre>
+     * <strong>Description: </strong> It adds a new podcast to the content creator's podcasts collection and in the general catalogue, ensuring that it is not already in it.
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized and have at least one producer
+     * <strong>pre: </strong> catalogue <strong>ArrayList</strong> must be initialized
+     * <strong>pos: </strong> foundProducer <strong>Producer</strong> modified with a new podcast in its list
+     * <strong>pos: </strong> catalogue <strong>ArrayList</strong> modified with a new podcast in it
+     * @param podcastName <strong>String</strong> name of the new podcast
+     * @param pictureUrl <strong>String</strong> url that represents the new podcast
+     * @param duration <strong>String</strong> duration written in "HH:MM:SS"
+     * @param category <strong>int</strong> category number 1.politics, 2.entertainment, 3.videoGames, 4.fashion
+     * @param description <strong>String</strong> description of the podcast
+     * @param contentCreatorName <strong>String</strong> name of the producer to which the podcast is going to be added.
+     * </pre>
+     */
+    public void registerPodcast(String podcastName, String pictureUrl, String duration, int category, String description, String contentCreatorName) {
+        User foundProducer = searchUser(contentCreatorName);
+        if(!(foundProducer instanceof ContentCreator) ) throw new IllegalArgumentException("Producer not found");
 
-        if( foundProducer == null || !(foundProducer instanceof ContentCreator) ) throw new IllegalArgumentException("Producer not found");
+        Podcast newPodcast = new Podcast(((ContentCreator)foundProducer).getName(), podcastName, pictureUrl, parseDuration(duration), category, description);
+        if(searchAudio(podcastName) != null) throw new IllegalArgumentException("Podcast is already in catalogue");
 
-        foundProducer.addAudio(newPodcast);
+        ((ContentCreator)foundProducer).addAudio(newPodcast);
         catalogue.add(newPodcast);
-
-        return true;
     }
 
-    public boolean registerPlaylist(String consumerName, int type, String name) {
-        Playlist newPlaylist = null;
-        switch (type) {
-            case 1:
-                newPlaylist = new Playlist(name);
-                break;
-            case 2:
-                newPlaylist = new PodcastPlaylist(name);
-                break;
-            case 3:
-                newPlaylist = new SongPlaylist(name);
-                break;
-        }
 
-        Consumer tmpConsumer = (Consumer)searchUser(consumerName);
-        if(tmpConsumer == null) return false;
+    /**
+     * <pre>
+     * <strong>Description: </strong> It adds a new playlist to the consumer's playlists collection and in the general list, ensuring that it is not already in it.
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized and have at least one consumer
+     * <strong>pre: </strong> catalogue <strong>ArrayList</strong> must be initialized and have at least one audio
+     * <strong>pre: </strong> playlists <strong>ArrayList</strong> must be initialized
+     * <strong>pos: </strong> foundConsumer <strong>Producer</strong> modified with a new playlist in its list
+     * <strong>pos: </strong> playlists <strong>ArrayList</strong> modified with a new playlist in it
+     * @param consumerName <strong>String</strong> name of the consumer to which the playlist is going to be added.
+     * @param type <strong>int</strong> type of playlist 1.AllSongs 2.OnlyPodcasts 3.OnlySongs
+     * @param name <strong>String</strong> name of the new playlist
+     * </pre>
+     */
+    public void registerPlaylist(String consumerName, int type, String name) {
+        Playlist newPlaylist = switch (type) {
+            case 1 -> new Playlist(name);
+            case 2 -> new PodcastPlaylist(name);
+            case 3 -> new SongPlaylist(name);
+            default -> throw new IllegalArgumentException("Invalid playlist type");
+        };
 
-        if(tmpConsumer.addPlaylist(newPlaylist)) {
-            playlists.add(newPlaylist);
-        } else {
-            return false;
-        }
-        return true;
+        User tmpConsumer = searchUser(consumerName);
+        if(!(tmpConsumer instanceof Consumer) ) throw new IllegalArgumentException("Consumer not found");
+
+        ((Consumer)tmpConsumer).addPlaylist(newPlaylist);
+        playlists.add(newPlaylist);
     }
 
     // PLAYLIST METHODS
 
-    public boolean renamePlaylist(String playlistId, String newName) {
-        Playlist tmpPlaylist = searchPlaylist(playlistId);
-        if(tmpPlaylist == null) return false;
+
+    /**
+     * <pre>
+     * <strong>Description:</strong> It allows to change the name of an existing playlist
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized and have at least one consumer
+     * <strong>pre: </strong> catalogue <strong>ArrayList</strong> must be initialized and have at least one audio
+     * <strong>pre: </strong> playlists <strong>ArrayList</strong> must be initialized with at least one playlist
+     * <strong>pos: </strong> tmpPlaylist <strong>Playlist</strong> will be renamed
+     * @param consumerName <strong>String</strong> name of the consumer that owns the playlist.
+     * @param playlistId <strong>String</strong> playlist unique identifier
+     * @param newName <strong>new name for the playlist</strong>
+     * </pre>
+     */
+    public void renamePlaylist(String consumerName, String playlistId, String newName) {
+        Consumer tmpConsumer = (Consumer)searchUser(consumerName);
+        if(tmpConsumer == null) throw new IllegalArgumentException("Consumer not found");
+        Playlist tmpPlaylist = tmpConsumer.searchPlaylist(playlistId);
+        if(tmpPlaylist == null) throw new IllegalArgumentException(String.format("Consumer %s does not have this playlist", tmpConsumer.getNickname()));
+
         tmpPlaylist.setName(newName);
-        return true;
     }
 
-    public boolean addOrRemoveAudioToPlaylist(int operation, String consumerName, String audioName, String playlistId) {
+    /**
+     * <pre>
+     * <strong>Description:</strong> It allows the user to add or remove a song from a selected playlist
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized and have at least one consumer
+     * <strong>pre: </strong> catalogue <strong>ArrayList</strong> must be initialized and have at least one audio
+     * <strong>pre: </strong> playlists <strong>ArrayList</strong> must be initialized with at least one playlist
+     * <strong>pos: </strong> tmpPlaylist <strong>Playlist</strong> will be modified with a song added or removed from its list
+     * @param consumerName <strong>String</strong> name of the consumer that owns the playlist.
+     * @param playlistId <strong>String</strong> playlist unique identifier
+     * @param operation <strong>int</strong> Operation to be performed: 1.adding, 2.removing
+     * @param audioName <strong>String</strong> name of the audio that is going to be added.
+     * </pre>
+     */
+    public void addOrRemoveAudioToPlaylist(int operation, String consumerName, String audioName, String playlistId) {
         Consumer tmpConsumer = (Consumer)searchUser(consumerName);
-        if(tmpConsumer == null) return false;
+        if(tmpConsumer == null) throw new IllegalArgumentException("Consumer not found");
         Playlist tmpPlaylist = tmpConsumer.searchPlaylist(playlistId);
-        if(tmpPlaylist == null) return false;
+        if(tmpPlaylist == null) throw new IllegalArgumentException("Playlist not found");
         Audio tmpAudio = searchAudio(audioName);
-        if(tmpAudio == null) return false;
-        return (operation == 1) ? tmpPlaylist.addAudio(tmpAudio) : (tmpPlaylist.removeAudio(tmpAudio));
+        if(tmpAudio == null) throw new IllegalArgumentException("Audio not found");
+        if(operation == 1) {
+            tmpPlaylist.addAudio(tmpAudio);
+        } else {
+            tmpPlaylist.removeAudio(tmpAudio);
+        }
     }
 
     public String sharePlaylist(String consumerName, String playlistId) {
@@ -127,43 +233,70 @@ public class Controller {
 
     // SHOWING METHODS
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> Prints the allowed genres of the platform
+     * @return songGenres <strong>String</strong> a readable list of genres
+     * </pre>
+     */
     public String showSongGenres() {
         String genresList = "";
         for(int i=0; i<SongGenre.values().length; i++) {
-            genresList += (i+1) + "." + SongGenre.values()[i] + ( (i<SongGenre.values().length-1) ? (", ") : (""));
+            genresList += (i+1) + "." + SongGenre.values()[i].toString().toLowerCase() + ( (i<SongGenre.values().length-1) ? (", ") : (""));
         }
         return genresList;
     }
+
+    /**
+     * <pre>
+     * <strong>Description:</strong> Prints the allowed podcast categories of the platform
+     * @return podcastCategories <strong>String</strong> a readable list of podcast categories
+     * </pre>
+     */
     public String showPodcastCategories() {
         String categoriesList = "";
         for(int i=0; i<PodcastCategory.values().length; i++) {
-            categoriesList += (i+1) + "." + SongGenre.values()[i] + ( (i<SongGenre.values().length-1) ? (", ") : (""));
+            categoriesList += (i+1) + "." + PodcastCategory.values()[i].toString().toLowerCase() + ( (i<PodcastCategory.values().length-1) ? (", ") : (""));
         }
         return categoriesList;
     }
 
+
+    /**
+     * <pre>
+     * <strong>Description:</strong> Prints the list of users of the platform. An empty text if there are none.
+     * @param type <strong>int</strong> User type: 0.All, 1.OnlyProducers, 2.OnlyConsumers
+     * @return userList <strong>String</strong> a readable list of users
+     * </pre>
+     */
     public String showUsers(int type) {
         String userList = "";
         for(User user : users) {
             switch (type) {
                 case 0:
-                    userList += "\n - " + ( (user instanceof Producer) ? (((Producer) user).getName() + " (Producer) ") : (((Consumer)user).getNickname() + " (Consumer) ") );
+                    userList += "\n - " + user;
                     break;
                 case 1:
-                    if(user instanceof Producer) userList += "\n - " + ((Producer)user).getName() + ((user instanceof Artist) ? " (Artist)" : " (Content creator)");
+                    if(user instanceof Producer) userList += "\n - " + user;
                     break;
                 case 2:
-                    if(user instanceof Consumer) userList += "\n - " + ((Consumer)user).getNickname() + ((user instanceof StandardConsumer) ? (" (Standard)")  : (" (Premium)"));
+                    if(user instanceof Consumer) userList += "\n - " + user;
             }
         }
-        return (type == 1) ? ("--- Producer list ---" + userList) : ("--- Consumer list ---" + userList);
+        return (userList.equals("")) ? ("") : ((type == 1) ? ("\n--- Producer list ---" + userList) : ("\n--- Consumer list ---" + userList));
     }
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> Prints the list of audios of the platform, that is, the catalogue. An empty text if there are not any audio.
+     * @return catalogueList <strong>String</strong> a readable list of audios
+     * </pre>
+     */
     public String showCatalogue() {
         String catalogueList = "";
 
         for(Audio audio : catalogue) {
-            catalogueList += "\n - " + audio.getName() + " by " + audio.getProducerName();
+            catalogueList += "\n - " + audio;
         }
         return ( catalogueList.equals("") ) ? ("") : ("\n--- Current Catalogue --- " ) + catalogueList;
     }
@@ -181,11 +314,19 @@ public class Controller {
         }
     }
 
-    public String showConsumerPlaylists(String consumerName) {
-        Consumer matchedConsumer = (Consumer)searchUser(consumerName);
-        if(matchedConsumer == null) return "Consumer not found";
+    /**
+     * <pre>
+     * <strong>Description:</strong> Prints the list of playlist that a selected consumer has.
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized and have at least one consumer
+     * <strong>pre: </strong> playlists <strong>ArrayList</strong> must be initialized and have at least one playlist
+     * @return consumerPlaylists <strong>String</strong> a readable list of playlists of the consumer
+     * </pre>
+     */
+    public String showConsumerPlaylists(String userName) {
+        User matchedConsumer = searchUser(userName);
+        if(!(matchedConsumer instanceof Consumer)) throw new IllegalArgumentException("Consumer not found");
 
-        return matchedConsumer.showPlaylists();
+        return ((Consumer)matchedConsumer).showPlaylists();
     }
 
     public String showPurchases() {
@@ -204,13 +345,30 @@ public class Controller {
 
     // SEARCHING METHODS
 
-    public User searchUser(String documentId) {
+
+    /**
+     * <pre>
+     * <strong>Description:</strong> It searches and returns the found user based on its name
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized
+     * @param userName <strong>String</strong> name if it is producer, or nickname if it is consumer
+     * @return foundUser <strong>User</strong> the user that match the name or nickname
+     * </pre>
+     */
+    public User searchUser(String userName) {
         for(User user : users) {
-            if(user.getDocumentId().equals(documentId)) return user;
+            if( (user instanceof Consumer && ((Consumer)user).getNickname().equals(userName) ) || ( user instanceof Producer && ((Producer) user).getName().equals(userName) ) ) return user;
         }
         return null;
     }
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> It searches and returns the found playlist based on its id
+     * <strong>pre:</strong> playlists <strong>ArrayList</strong> must be initialized
+     * @param id <strong>String</strong> playlist unique identifier
+     * @return foundPlaylist <strong>Playlist</strong> the playlist for which its id matches with the given
+     * </pre>
+     */
     public Playlist searchPlaylist(String id) {
         for(Playlist playlist : playlists) {
             if(playlist.getId().equals(id)) return playlist;
@@ -218,6 +376,14 @@ public class Controller {
         return null;
     }
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> It searches and returns the found audio based on its name
+     * <strong>pre:</strong> catalogue <strong>ArrayList</strong> must be initialized
+     * @param audioName <strong>String</strong> target audio name
+     * @return foundAudio <strong>Audio</strong> the audio that matches with the name
+     * </pre>
+     */
     public Audio searchAudio(String audioName) {
         for(Audio audio : catalogue) {
             if(audio.getName().equals(audioName)) return audio;
@@ -227,12 +393,12 @@ public class Controller {
 
     // PLAYING
 
-    public String[] playAudio(String consumerId, String audioName) {
+    public String[] playAudio(String consumerName, String audioName) {
         String[] audioList = new String[2];
         Random rnd = new Random();
         Advertisement advertisement = ADS[rnd.nextInt(ADS.length-1)];
 
-        Consumer tmpConsumer = (Consumer)searchUser(consumerId);
+        Consumer tmpConsumer = (Consumer)searchUser(consumerName);
 
         Audio tmpAudio = searchAudio(audioName);
         if(tmpConsumer == null || tmpAudio == null) throw new IllegalArgumentException("Consumer or audio not found");
@@ -248,8 +414,8 @@ public class Controller {
     }
 
     // BUYING
-    public boolean buySong(String consumerId, String songName) {
-        Consumer tmpConsumer = (Consumer)searchUser(consumerId);
+    public boolean buySong(String consumerName, String songName) {
+        Consumer tmpConsumer = (Consumer)searchUser(consumerName);
         Audio tmpAudio = searchAudio(songName);
         if(tmpConsumer == null || tmpAudio == null || !(tmpAudio instanceof Song)) return false;
 
@@ -261,9 +427,9 @@ public class Controller {
 
     // STATISTICS
 
-    public String usersMostPlayedSongGenre(String consumerId) {
+    public String usersMostPlayedSongGenre(String consumerName) {
         String statistics = "";
-        Consumer tmpConsumer = (Consumer)searchUser(consumerId);
+        Consumer tmpConsumer = (Consumer)searchUser(consumerName);
         if(tmpConsumer == null) return "not found";
 
         int[] maxSong = tmpConsumer.mostPlayedSongGenre();
@@ -271,9 +437,9 @@ public class Controller {
         statistics += String.format("For user %s: %nMost played song genre: %s (%d plays)", tmpConsumer.getNickname(), SongGenre.values()[maxSong[0]], maxSong[1]);
         return statistics;
     }
-    public String usersMostPlayedPodcastCategory(String consumerId) {
+    public String usersMostPlayedPodcastCategory(String consumerName) {
         String statistics = "";
-        Consumer tmpConsumer = (Consumer)searchUser(consumerId);
+        Consumer tmpConsumer = (Consumer)searchUser(consumerName);
         if(tmpConsumer == null) return "not found";
 
         int[] maxPodcast = tmpConsumer.mostPlayedPodcastCategory();
@@ -424,11 +590,26 @@ public class Controller {
         return String.format("----- Best seller information -----%n - Name: %s%n - Sales number: %d%n - Income: $%.2f", bestSeller.getName(), ((Song)bestSeller).getNumberOfSales(), ((Song)bestSeller).getTotalIncome());
     }
 
+
+    /**
+     * <pre>
+     * <strong>Description: </strong> It parses a text that represents an audio duration to seconds
+     * @param durationStr <strong>String</strong> Duration in format hh:mm:ss or mm:ss
+     * @return duration <strong>int</strong> duration in seconds
+     * </pre>
+     */
     public int parseDuration(String durationStr) {
         int duration = 0;
         String[] durationArr =  durationStr.split(":");
         for(int i=0, j=durationArr.length-1; i<durationArr.length; i++) {
-            duration += Integer.parseInt(durationArr[i]) * 60 * j;
+            int durationInt;
+            try {
+                durationInt = Integer.parseInt(durationArr[i]);
+            } catch(Exception e) {
+                throw new IllegalArgumentException("Invalid format for duration");
+            }
+            if(durationInt >= 60 || durationInt < 0) throw new IllegalArgumentException("Time out of bounds");
+            duration += Integer.parseInt(durationArr[i]) * Math.pow(60,j);
             j--;
         }
         return duration;

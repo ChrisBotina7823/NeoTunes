@@ -23,8 +23,9 @@ public class PodcastPlaylist extends Playlist {
     }
 
     @Override
-    public boolean addAudio(Audio newAudio) {
-        if( !(newAudio instanceof Podcast) || searchAudio(newAudio) != null) return false;
-        return super.getAudios().add(newAudio);
+    public void addAudio(Audio newAudio) {
+        if(searchAudio(newAudio) != null) throw new IllegalArgumentException("Audio is already in playlist");
+        if(!(newAudio instanceof Podcast)) throw new IllegalArgumentException("This playlist only supports podcasts");
+        getAudios().add(newAudio);
     }
 }

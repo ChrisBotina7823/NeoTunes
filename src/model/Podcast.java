@@ -1,7 +1,5 @@
 package model;
 
-import java.util.Arrays;
-
 public class Podcast extends Audio {
     private PodcastCategory category;
     private String description;

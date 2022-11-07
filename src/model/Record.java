@@ -13,26 +13,23 @@ public class Record {
         this.date = LocalDateTime.now();
     }
 
+    // GETTERS AND SETTERS
+
     public String getConsumerName() {
         return consumerName;
     }
-
     public void setConsumerName(String consumerName) {
         this.consumerName = consumerName;
     }
-
     public Audio getAudio() {
         return audio;
     }
-
     public void setAudio(Audio audio) {
         this.audio = audio;
     }
-
     public LocalDateTime getDate() {
         return date;
     }
-
     public void setDate(LocalDateTime date) {
         this.date = date;
     }

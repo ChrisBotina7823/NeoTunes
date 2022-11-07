@@ -63,9 +63,9 @@ public class Playlist {
     public String showAudios() {
         String audioList = "";
         for(Audio audio : audios) {
-            audioList += "\n\t - " + audio.getName();
+            audioList += "\n\t - " + audio;
         }
-        return (audioList.equals("")) ? ("There are not songs yet") : (audioList);
+        return (audioList.equals("")) ? ("There are not audios yet") : (audioList);
     }
 
     public void calculateMatrixId() {
@@ -88,12 +88,13 @@ public class Playlist {
         setId(newId);
     }
 
-    public boolean addAudio(Audio newAudio) {
-        if(searchAudio(newAudio) != null) return false;
-        return audios.add(newAudio);
+    public void addAudio(Audio newAudio) {
+        if(searchAudio(newAudio) != null) throw new IllegalArgumentException("Audio is already in playlist");
+        audios.add(newAudio);
     }
-    public boolean removeAudio(Audio tmpAudio) {
-        return audios.remove(tmpAudio);
+    public void removeAudio(Audio tmpAudio) {
+        if(searchAudio(tmpAudio) == null) throw new IllegalArgumentException("This audio is not in the playlist");
+        audios.remove(tmpAudio);
     }
 
     public Audio searchAudio(Audio newAudio) {

@@ -31,46 +31,38 @@ public class Song extends Audio {
         this.numberOfSales = 0;
     }
 
+    // GETTERS AND SETTERS
+
     public LocalDate getPurchaseDate() {
         return purchaseDate;
     }
-
     public void setPurchaseDate(LocalDate purchaseDate) {
         this.purchaseDate = purchaseDate;
     }
-
     public SongGenre getGenre() {
         return genre;
     }
-
     public void setGenre(SongGenre genre) {
         this.genre = genre;
     }
-
     public String getAlbum() {
         return album;
     }
-
     public void setAlbum(String album) {
         this.album = album;
     }
-
     public double getSaleValue() {
         return saleValue;
     }
-
     public void setSaleValue(double saleValue) {
         this.saleValue = saleValue;
     }
-
     public int getNumberOfSales() {
         return numberOfSales;
     }
-
     public void increaseNumberOfSales() {
         this.numberOfSales++;
     }
-
     public double getTotalIncome() {
         return numberOfSales * saleValue;
     }
