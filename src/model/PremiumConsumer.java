@@ -7,17 +7,16 @@ public class PremiumConsumer extends Consumer {
     }
 
     @Override
-    public void addPlaylist(Playlist newPlaylist) {
-        if(searchPlaylist(newPlaylist.getId()) != null) throw new IllegalArgumentException("Playlist already in consumer list");
-        super.getPlaylists().add(newPlaylist);
+    public boolean addPlaylist(Playlist newPlaylist) {
+        if(searchPlaylist(newPlaylist.getId()) != null) return false;
+        return getPlaylists().add(newPlaylist);
     }
 
     @Override
     public boolean addSong(Song newSong) {
         if(searchSong(newSong.getName()) != null) return false;
-        getSongs().add(newSong);
         newSong.increaseNumberOfSales();
-        return true;
+        return getSongs().add(newSong);
     }
 
 }

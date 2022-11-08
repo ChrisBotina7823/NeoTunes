@@ -35,12 +35,13 @@ public class Controller {
      * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new user in it
      * @param name new content creator name
      * @param pictureUrl picture that represents the artist
+     * @return status <strong>boolean</strong> It will be false if the content creator is already in the collection
      * </pre>
      */
-    public void registerContentCreator(String name, String pictureUrl) {
-        if(searchUser(name) != null) throw new IllegalArgumentException("Content creator is already in list");
+    public boolean registerContentCreator(String name, String pictureUrl) {
+        if(searchUser(name) != null) return false;
         ContentCreator newContentCreator = new ContentCreator(name, pictureUrl);
-        users.add(newContentCreator);
+        return users.add(newContentCreator);
     }
 
 
@@ -50,13 +51,13 @@ public class Controller {
      * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized
      * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new user in it
      * @param name new artist name
-     * @param pictureUrl picture that represents the artist
+     * @return status <strong>boolean</strong> It will be false if the artist is already in the collection
      * </pre>
      */
-    public void registerArtist(String name, String pictureUrl) {
-        if(searchUser(name) != null) throw new IllegalArgumentException("Artist is already in list");
+    public boolean registerArtist(String name, String pictureUrl) {
+        if(searchUser(name) != null) return false;
         Artist newArtist = new Artist(name, pictureUrl);
-        users.add(newArtist);
+        return users.add(newArtist);
     }
 
     /**
@@ -66,12 +67,13 @@ public class Controller {
      * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new user in it
      * @param nickname new artist name
      * @param documentId new user's document
+     * @return status <strong>boolean</strong> It will be false if the standard consumer is already in the collection
      * </pre>
      */
-    public void registerStandardConsumer(String nickname, String documentId) {
-        if(searchUser(nickname) != null) throw new IllegalArgumentException("Consumer is already in list");
+    public boolean registerStandardConsumer(String nickname, String documentId) {
+        if(searchUser(nickname) != null) return false;
         StandardConsumer newStandardConsumer = new StandardConsumer(nickname, documentId);
-        users.add(newStandardConsumer);
+        return users.add(newStandardConsumer);
     }
 
     /**
@@ -81,12 +83,13 @@ public class Controller {
      * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new user in it
      * @param nickname new artist name
      * @param documentId new user's document
+     * @return status <strong>boolean</strong> It will be false if the premium consumer is already in the collection
      * </pre>
      */
-    public void registerPremiumConsumer(String nickname, String documentId) {
-        if(searchUser(nickname) != null) throw new IllegalArgumentException("Consumer is already in list");
+    public boolean registerPremiumConsumer(String nickname, String documentId) {
+        if(searchUser(nickname) != null) return false;
         PremiumConsumer newPremiumConsumer = new PremiumConsumer(nickname, documentId);
-        users.add(newPremiumConsumer);
+        return users.add(newPremiumConsumer);
     }
 
     /**
@@ -103,17 +106,18 @@ public class Controller {
      * @param album <strong>String</strong> name of the album that contains the song
      * @param saleValue <strong>double</strong> sale value of the song
      * @param artistName <strong>String</strong> name of the producer to which the song is going to be added.
+     * @return status <strong>boolean</strong> It will be false if the producer is not found or the audio is already in the list
      * </pre>
      */
-    public void registerSong(String songName, String pictureUrl, String duration, int genre, String album, double saleValue, String artistName) {
+    public boolean registerSong(String songName, String pictureUrl, int duration, int genre, String album, double saleValue, String artistName) {
         User foundProducer = searchUser(artistName);
-        if(!(foundProducer instanceof Artist)) throw new IllegalArgumentException("Artist not found");
+        if(!(foundProducer instanceof Artist)) return false;
 
-        Song newSong = new Song(((Artist)foundProducer).getName(), songName, pictureUrl, parseDuration(duration), genre, album, saleValue);
-        if(searchAudio(songName) != null) throw new IllegalArgumentException("Song is already in catalogue");
+        Song newSong = new Song(((Artist)foundProducer).getName(), songName, pictureUrl, duration, genre, album, saleValue);
+        if(searchAudio(songName) != null) return false;
 
         ((Artist)foundProducer).addAudio(newSong);
-        catalogue.add(newSong);
+        return catalogue.add(newSong);
     }
 
 
@@ -130,17 +134,18 @@ public class Controller {
      * @param category <strong>int</strong> category number 1.politics, 2.entertainment, 3.videoGames, 4.fashion
      * @param description <strong>String</strong> description of the podcast
      * @param contentCreatorName <strong>String</strong> name of the producer to which the podcast is going to be added.
+     * @return status <strong>boolean</strong> It will be false if the producer is not found or the audio is already in the list
      * </pre>
      */
-    public void registerPodcast(String podcastName, String pictureUrl, String duration, int category, String description, String contentCreatorName) {
+    public boolean registerPodcast(String podcastName, String pictureUrl, int duration, int category, String description, String contentCreatorName) {
         User foundProducer = searchUser(contentCreatorName);
-        if(!(foundProducer instanceof ContentCreator) ) throw new IllegalArgumentException("Producer not found");
+        if(!(foundProducer instanceof ContentCreator) ) return false;
 
-        Podcast newPodcast = new Podcast(((ContentCreator)foundProducer).getName(), podcastName, pictureUrl, parseDuration(duration), category, description);
-        if(searchAudio(podcastName) != null) throw new IllegalArgumentException("Podcast is already in catalogue");
+        Podcast newPodcast = new Podcast(((ContentCreator)foundProducer).getName(), podcastName, pictureUrl, duration, category, description);
+        if(searchAudio(podcastName) != null) return false;
 
         ((ContentCreator)foundProducer).addAudio(newPodcast);
-        catalogue.add(newPodcast);
+        return catalogue.add(newPodcast);
     }
 
 
@@ -155,21 +160,26 @@ public class Controller {
      * @param consumerName <strong>String</strong> name of the consumer to which the playlist is going to be added.
      * @param type <strong>int</strong> type of playlist 1.AllSongs 2.OnlyPodcasts 3.OnlySongs
      * @param name <strong>String</strong> name of the new playlist
+     * @return status <strong>boolean</strong> It will be false if the consumer is not found or the consumer playlists list is full
      * </pre>
      */
-    public void registerPlaylist(String consumerName, int type, String name) {
+    public boolean registerPlaylist(String consumerName, int type, String name) {
         Playlist newPlaylist = switch (type) {
             case 1 -> new Playlist(name);
             case 2 -> new PodcastPlaylist(name);
             case 3 -> new SongPlaylist(name);
-            default -> throw new IllegalArgumentException("Invalid playlist type");
+            default -> null;
         };
+        if(newPlaylist == null) return false;
 
         User tmpConsumer = searchUser(consumerName);
-        if(!(tmpConsumer instanceof Consumer) ) throw new IllegalArgumentException("Consumer not found");
+        if(!(tmpConsumer instanceof Consumer) ) return false;
 
-        ((Consumer)tmpConsumer).addPlaylist(newPlaylist);
-        playlists.add(newPlaylist);
+        if(((Consumer)tmpConsumer).addPlaylist(newPlaylist)) {
+            return playlists.add(newPlaylist);
+        } else {
+            return false;
+        }
     }
 
     // PLAYLIST METHODS
@@ -185,15 +195,17 @@ public class Controller {
      * @param consumerName <strong>String</strong> name of the consumer that owns the playlist.
      * @param playlistId <strong>String</strong> playlist unique identifier
      * @param newName <strong>new name for the playlist</strong>
+     * @return status <strong>boolean</strong> It will be false if the playlist or consumer are not found
      * </pre>
      */
-    public void renamePlaylist(String consumerName, String playlistId, String newName) {
+    public boolean renamePlaylist(String consumerName, String playlistId, String newName) {
         Consumer tmpConsumer = (Consumer)searchUser(consumerName);
-        if(tmpConsumer == null) throw new IllegalArgumentException("Consumer not found");
+        if(tmpConsumer == null) return false;
         Playlist tmpPlaylist = tmpConsumer.searchPlaylist(playlistId);
-        if(tmpPlaylist == null) throw new IllegalArgumentException(String.format("Consumer %s does not have this playlist", tmpConsumer.getNickname()));
+        if(tmpPlaylist == null) return false;
 
         tmpPlaylist.setName(newName);
+        return true;
     }
 
     /**
@@ -207,19 +219,19 @@ public class Controller {
      * @param playlistId <strong>String</strong> playlist unique identifier
      * @param operation <strong>int</strong> Operation to be performed: 1.adding, 2.removing
      * @param audioName <strong>String</strong> name of the audio that is going to be added.
+     * @return status <strong>boolean</strong> It will be false if the producer is not found or the audio is already in the list
      * </pre>
      */
-    public void addOrRemoveAudioToPlaylist(int operation, String consumerName, String audioName, String playlistId) {
-        Consumer tmpConsumer = (Consumer)searchUser(consumerName);
-        if(tmpConsumer == null) throw new IllegalArgumentException("Consumer not found");
-        Playlist tmpPlaylist = tmpConsumer.searchPlaylist(playlistId);
-        if(tmpPlaylist == null) throw new IllegalArgumentException("Playlist not found");
+    public boolean addOrRemovePlaylistAudio(int operation, String consumerName, String audioName, String playlistId) {
+        User tmpConsumer = searchUser(consumerName);
+        if(!(tmpConsumer instanceof Consumer)) return false;
+        Playlist tmpPlaylist = ((Consumer)tmpConsumer).searchPlaylist(playlistId);
         Audio tmpAudio = searchAudio(audioName);
-        if(tmpAudio == null) throw new IllegalArgumentException("Audio not found");
+        if(tmpAudio == null || tmpPlaylist == null) return false;
         if(operation == 1) {
-            tmpPlaylist.addAudio(tmpAudio);
+            return tmpPlaylist.addAudio(tmpAudio);
         } else {
-            tmpPlaylist.removeAudio(tmpAudio);
+            return tmpPlaylist.removeAudio(tmpAudio);
         }
     }
 
@@ -228,7 +240,7 @@ public class Controller {
         if(tmpConsumer == null) return "User not found";
         Playlist tmpPlaylist = searchPlaylist(playlistId);
         if(tmpPlaylist == null) return "User does not have the playlist";
-        return "\n" + tmpPlaylist.toString();
+        return "\n" + tmpPlaylist;
     }
 
     // SHOWING METHODS
@@ -319,12 +331,12 @@ public class Controller {
      * <strong>Description:</strong> Prints the list of playlist that a selected consumer has.
      * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized and have at least one consumer
      * <strong>pre: </strong> playlists <strong>ArrayList</strong> must be initialized and have at least one playlist
-     * @return consumerPlaylists <strong>String</strong> a readable list of playlists of the consumer
+     * @return consumerPlaylists <strong>String</strong> a readable list of playlists of the consumer, it will be an empty String if the consumer is not found
      * </pre>
      */
     public String showConsumerPlaylists(String userName) {
         User matchedConsumer = searchUser(userName);
-        if(!(matchedConsumer instanceof Consumer)) throw new IllegalArgumentException("Consumer not found");
+        if(!(matchedConsumer instanceof Consumer)) return "";
 
         return ((Consumer)matchedConsumer).showPlaylists();
     }
@@ -356,7 +368,11 @@ public class Controller {
      */
     public User searchUser(String userName) {
         for(User user : users) {
-            if( (user instanceof Consumer && ((Consumer)user).getNickname().equals(userName) ) || ( user instanceof Producer && ((Producer) user).getName().equals(userName) ) ) return user;
+            if(user instanceof Consumer && ((Consumer)user).getNickname().equalsIgnoreCase(userName)) {
+                return user;
+            } else if(user instanceof Producer && ((Producer) user).getName().equalsIgnoreCase(userName)) {
+                return user;
+            }
         }
         return null;
     }
@@ -386,7 +402,7 @@ public class Controller {
      */
     public Audio searchAudio(String audioName) {
         for(Audio audio : catalogue) {
-            if(audio.getName().equals(audioName)) return audio;
+            if(audio.getName().equalsIgnoreCase(audioName)) return audio;
         }
         return null;
     }
@@ -401,7 +417,7 @@ public class Controller {
         Consumer tmpConsumer = (Consumer)searchUser(consumerName);
 
         Audio tmpAudio = searchAudio(audioName);
-        if(tmpConsumer == null || tmpAudio == null) throw new IllegalArgumentException("Consumer or audio not found");
+        if(tmpConsumer == null || tmpAudio == null) return new String[]{""};
 
         tmpConsumer.playAudio(tmpAudio);
         if(tmpConsumer instanceof Advertisable) {
@@ -417,12 +433,14 @@ public class Controller {
     public boolean buySong(String consumerName, String songName) {
         Consumer tmpConsumer = (Consumer)searchUser(consumerName);
         Audio tmpAudio = searchAudio(songName);
-        if(tmpConsumer == null || tmpAudio == null || !(tmpAudio instanceof Song)) return false;
+        if(tmpConsumer == null) return false;
+        if(!(tmpAudio instanceof Song)) return false;
 
         if(tmpConsumer.addSong((Song)tmpAudio)) {
-            purchases.add(new Record(tmpConsumer.getNickname(), tmpAudio));
+            return purchases.add(new Record(tmpConsumer.getNickname(), tmpAudio));
+        } else {
+            return false;
         }
-        return true;
     }
 
     // STATISTICS
@@ -579,7 +597,7 @@ public class Controller {
 
     public String bestSellerInformation() {
         if(catalogue.isEmpty()) return "";
-        Audio bestSeller = null;
+        Audio bestSeller = catalogue.get(0);
         int maxSales = 0;
         for(Audio song : catalogue) {
             if( song instanceof  Song && ((Song)song).getNumberOfSales() > maxSales) {
@@ -589,30 +607,4 @@ public class Controller {
         }
         return String.format("----- Best seller information -----%n - Name: %s%n - Sales number: %d%n - Income: $%.2f", bestSeller.getName(), ((Song)bestSeller).getNumberOfSales(), ((Song)bestSeller).getTotalIncome());
     }
-
-
-    /**
-     * <pre>
-     * <strong>Description: </strong> It parses a text that represents an audio duration to seconds
-     * @param durationStr <strong>String</strong> Duration in format hh:mm:ss or mm:ss
-     * @return duration <strong>int</strong> duration in seconds
-     * </pre>
-     */
-    public int parseDuration(String durationStr) {
-        int duration = 0;
-        String[] durationArr =  durationStr.split(":");
-        for(int i=0, j=durationArr.length-1; i<durationArr.length; i++) {
-            int durationInt;
-            try {
-                durationInt = Integer.parseInt(durationArr[i]);
-            } catch(Exception e) {
-                throw new IllegalArgumentException("Invalid format for duration");
-            }
-            if(durationInt >= 60 || durationInt < 0) throw new IllegalArgumentException("Time out of bounds");
-            duration += Integer.parseInt(durationArr[i]) * Math.pow(60,j);
-            j--;
-        }
-        return duration;
-    }
-
 }

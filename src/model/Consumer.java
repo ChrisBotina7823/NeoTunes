@@ -55,7 +55,7 @@ public abstract class Consumer extends User {
      * @param newPlaylist <strong>Playlist</strong> the playlist that is going to be added to the list
      * </pre>
      */
-    public abstract void addPlaylist(Playlist newPlaylist);
+    public abstract boolean addPlaylist(Playlist newPlaylist);
 
     /**
      * <pre>
@@ -100,6 +100,7 @@ public abstract class Consumer extends User {
      * <strong>Description: </strong> It adds a new song to the consumer's songs collection, ensuring that it is not already in it.
      * <strong>pre:</strong> songs <strong>ArrayList</strong> must be initialized
      * @param newSong <strong>Audio</strong> the song that is going to be added to the list
+     * @return status <strong>boolean</strong> it is false if the song is already in the consumer's songs collection
      * </pre>
      */
     public abstract boolean addSong(Song newSong);

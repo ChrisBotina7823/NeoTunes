@@ -1,21 +1,23 @@
 package model;
 
-import java.util.Arrays;
-
 public abstract class Audio {
     private String name;
     private String pictureUrl;
     private int numberOfPlays;
     private int duration;
 
-    private String producerId;
+    private String producerName;
 
-    public Audio(String name, String pictureUrl, int duration, String producerId) {
+    public Audio(String name, String pictureUrl, int duration, String producerName) {
         this.name = name;
         this.numberOfPlays = 0;
         this.pictureUrl = pictureUrl;
-        this.duration = duration;
-        this.producerId = producerId;
+        if(duration > 0) {
+            this.duration = duration;
+        } else {
+            throw new IllegalArgumentException("Duration must be greater than 0");
+        }
+        this.producerName = producerName;
     }
 
     public String getName() {
@@ -51,11 +53,11 @@ public abstract class Audio {
     }
 
     public String getProducerName() {
-        return producerId;
+        return producerName;
     }
 
     public void setProducerName(String producerId) {
-        this.producerId = producerId;
+        this.producerName = producerId;
     }
 
     public void increaseNumberOfPlays() {

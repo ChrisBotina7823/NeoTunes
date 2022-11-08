@@ -14,12 +14,16 @@ public class Manager {
 
     public static void main(String[] args) {
         Manager manager = new Manager();
-        // manager.test();
         manager.showMenu();
     }
 
     // MENUS
 
+    /**
+     * <pre>
+     * <strong>Description: </strong> Shows the menu options to the user, it ensures that the answer is a valid number.
+     * </pre>
+     */
     public void showMenu() {
         int operation;
         do {
@@ -42,6 +46,7 @@ public class Manager {
                     System.out.print("Option: ");
                     operation = Integer.parseInt(sc.nextLine());
                 } catch(Exception e) {
+                    System.out.println("");
                 }
             }
             switch (operation) {
@@ -68,7 +73,7 @@ public class Manager {
      * </pre>
      */
     public void registerProducer() {
-        String info[]; int type;
+        String[] info; int type;
         String name, pictureUrl; // attributes
 
         // getting information
@@ -93,17 +98,26 @@ public class Manager {
             return;
         }
 
-        try { // registering
-            switch(type) {
-                case 1 -> controller.registerArtist(name, pictureUrl);
-                case 2 -> controller.registerContentCreator(name, pictureUrl);
-                default -> throw new IllegalArgumentException("Invalid producer type");
+        switch(type) {
+            case 1 -> {
+                if(!controller.registerArtist(name, pictureUrl)){
+                    System.out.println("\nError adding artist");
+                    return;
+                }
             }
-            System.out.println("\nProducer registered successfully");
-            System.out.println(controller.showUsers(1));
-        } catch(Exception e) {
-            System.out.println("\nError adding producer: " + e.getMessage());
+            case 2 -> {
+                if (!controller.registerContentCreator(name, pictureUrl)) {
+                    System.out.println("\nError adding content creator");
+                    return;
+                }
+            }
+            default -> {
+                System.out.println("\nInvalid producer type");
+                return;
+            }
         }
+        System.out.println("\nProducer registered successfully");
+        System.out.println(controller.showUsers(1));
 
     }
 
@@ -113,7 +127,7 @@ public class Manager {
      * </pre>
      */
     public void registerConsumer() {
-        String info[]; int type;
+        String[] info; int type;
         String nickName, documentId; // attributes
 
         // getting information
@@ -138,17 +152,26 @@ public class Manager {
             return;
         }
 
-        try { // registering
-            switch(type) {
-                case 1 -> controller.registerStandardConsumer(nickName, documentId);
-                case 2 -> controller.registerPremiumConsumer(nickName, documentId);
-                default -> throw new IllegalArgumentException("Invalid consumer type");
+        switch(type) {
+            case 1 -> {
+                if(!controller.registerStandardConsumer(nickName, documentId)) {
+                    System.out.println("\nError adding standard consumer");
+                    return;
+                }
             }
-            System.out.println("\nConsumer registered successfully");
-            System.out.println(controller.showUsers(2));
-        } catch(Exception e) {
-            System.out.println("\nError adding consumer: " + e.getMessage());
+            case 2 -> {
+                if (!controller.registerPremiumConsumer(nickName, documentId)) {
+                    System.out.println("\nError adding standard consumer");
+                    return;
+                }
+            }
+            default -> {
+                System.out.println("\nInvalid consumer type");
+                return;
+            }
         }
+        System.out.println("\nConsumer registered successfully");
+        System.out.println(controller.showUsers(2));
     }
 
     /**
@@ -161,8 +184,8 @@ public class Manager {
             System.out.println("\nFirst add a producer");
             return;
         }
-        String info[]; int type;
-        String name, pictureUrl, duration, producerId; // general attributes
+        String[] info; int type;
+        String name, pictureUrl, producerId; int duration ; // general attributes
 
         // getting information
         System.out.printf("""
@@ -191,33 +214,48 @@ public class Manager {
             type = Integer.parseInt(info[0]);
             name = info[1];
             pictureUrl = info[2];
-            duration = info[3];
+            duration = parseDuration(info[3]);
             producerId = info[6];
         } catch(Exception e) {
             System.out.println("\nError: Invalid format");
             return;
         }
 
-        try { // registering
-            switch (type) {
-                case 1 -> {
-                    String album = info[5];
-                    int genre = Integer.parseInt(info[4]);
-                    double saleValue = Double.parseDouble(info[7]); // song attributes
-                    controller.registerSong(name, pictureUrl, duration, genre, album, saleValue, producerId);
+        switch (type) {
+            case 1 -> {
+                String album; int genre; double saleValue;
+                try { // parsing song attributes
+                    album = info[5];
+                    genre = Integer.parseInt(info[4]);
+                    saleValue = Double.parseDouble(info[7]);
+                } catch(Exception e) {
+                    System.out.println("\nError: Invalid format");
+                    return;
                 }
-                case 2 -> {
-                    String description = info[5];
-                    int category = Integer.parseInt(info[4]); // podcast attributes
-                    controller.registerPodcast(name, pictureUrl, duration, category, description, producerId);
+                if(!controller.registerSong(name, pictureUrl, duration, genre, album, saleValue, producerId)) {
+                    System.out.println("\nError registering song");
+                    return;
                 }
-                default -> throw new IllegalArgumentException("Invalid audio type");
+
             }
-            System.out.println("\nAudio registered successfully");
-            System.out.println(controller.showCatalogue());
-        } catch(Exception e) {
-            System.out.println("\nError adding audio: " + e.getMessage());
+            case 2 -> {
+                String description; int category;
+                try { // parsing podcast attributes
+                    description = info[5];
+                    category = Integer.parseInt(info[4]);
+                } catch (Exception e) {
+                    System.out.println("\nError: Invalid format");
+                    return;
+                }
+                if(!controller.registerPodcast(name, pictureUrl, duration, category, description, producerId)) {
+                    System.out.println("\nError registering podcast");
+                    return;
+                }
+            }
+            default -> throw new IllegalArgumentException("Invalid audio type");
         }
+        System.out.println("\nAudio registered successfully");
+        System.out.println(controller.showCatalogue());
     }
 
     /**
@@ -230,7 +268,7 @@ public class Manager {
             System.out.println("\nFirst add a consumer");
             return;
         }
-        String info[]; int type;
+        String[] info; int type;
         String name, consumerName; // general attributes
 
         // getting information
@@ -258,13 +296,13 @@ public class Manager {
             return;
         }
 
-        try { // registering
-            controller.registerPlaylist(consumerName, type, name);
-            System.out.println("\nPlaylist registered successfully, you can check the matrix by sharing it.");
-            System.out.println(controller.showConsumerPlaylists(consumerName));
-        } catch(Exception e) {
-            System.out.println("\nError adding playlist: " + e.getMessage());
+        if(controller.registerPlaylist(consumerName, type, name)) {
+            System.out.println("\nError adding playlist");
+            return;
         }
+
+        System.out.println("\nPlaylist registered successfully, you can check the matrix by sharing it.");
+        System.out.println(controller.showConsumerPlaylists(consumerName));
     }
 
     // INTERACTION
@@ -280,7 +318,7 @@ public class Manager {
             return;
         }
 
-        String info[]; int operation;
+        String[] info; int operation;
         String newName, id, consumerName; // general attributes
 
         System.out.print("""
@@ -318,18 +356,31 @@ public class Manager {
             return;
         }
 
-        try { // registering
-            switch(operation) {
-                case 1 -> controller.addOrRemoveAudioToPlaylist(1, consumerName, newName, id);
-                case 2 -> controller.addOrRemoveAudioToPlaylist(2, consumerName, newName, id);
-                case 3 -> controller.renamePlaylist(consumerName, id, newName);
-                default -> throw new IllegalArgumentException("\nInvalid option");
+        switch(operation) {
+            case 1 -> {
+                if(!controller.addOrRemovePlaylistAudio(1, consumerName, newName, id)) {
+                    System.out.println("\nError adding song to playlist");
+                    return;
+                }
             }
-            System.out.println("\nPlaylist edited successfully");
-            System.out.println(controller.showConsumerPlaylists(consumerName));
-        } catch(Exception e) {
-            System.out.println("\nError editing playlist: " + e.getMessage());
+            case 2 -> {
+                if(controller.addOrRemovePlaylistAudio(2, consumerName, newName, id)){
+                    System.out.println("\nError removing song from playlist");
+                    return;
+                }
+            }
+            case 3 -> {
+                if(controller.renamePlaylist(consumerName, id, newName)) {
+                    System.out.printf("%nError renaming playlist to %s", newName);
+                }
+            }
+            default -> {
+                System.out.println("\nInvalid operation");
+                return;
+            }
         }
+        System.out.println("\nPlaylist edited successfully");
+        System.out.println(controller.showConsumerPlaylists(consumerName));
     }
     public void sharePlaylist() {
 
@@ -347,4 +398,24 @@ public class Manager {
 
     }
 
+    // UTILITIES
+
+    /**
+     * <pre>
+     * <strong>Description: </strong> It parses a text that represents an audio duration to seconds
+     * @param durationStr <strong>String</strong> Duration in format hh:mm:ss or mm:ss
+     * @return duration <strong>int</strong> duration in seconds
+     * </pre>
+     */
+    public int parseDuration(String durationStr) throws Exception {
+        int duration = 0;
+        String[] durationArr =  durationStr.split(":");
+        for(int i=0, j=durationArr.length-1; i<durationArr.length; i++) {
+            int durationInt = Integer.parseInt(durationArr[i]);
+            if(durationInt >= 60 || durationInt < 0) throw new Exception();
+            duration += Integer.parseInt(durationArr[i]) * Math.pow(60,j);
+            j--;
+        }
+        return duration;
+    }
 }

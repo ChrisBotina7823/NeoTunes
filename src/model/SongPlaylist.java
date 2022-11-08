@@ -7,7 +7,7 @@ public class SongPlaylist extends Playlist {
     }
 
     @Override
-    public void calculateId() {
+    public String calculateId() {
         int[][] matrixId = getMatrixId();
         // only songs - n
         String newId = "";
@@ -20,13 +20,13 @@ public class SongPlaylist extends Playlist {
                 newId += matrixId[i][i];
             }
         }
-        setId(newId);
+        return newId;
     }
 
     @Override
-    public void addAudio(Audio newAudio) {
-        if(searchAudio(newAudio) != null ) throw new IllegalArgumentException("Audio is already in playlist");
-        if(!(newAudio instanceof Song) ) throw new IllegalArgumentException("This playlist only supports songs");
-        getAudios().add(newAudio);
+    public boolean addAudio(Audio newAudio) {
+        if(searchAudio(newAudio) != null ) return false;
+        if(!(newAudio instanceof Song) ) return false;
+        return getAudios().add(newAudio);
     }
 }

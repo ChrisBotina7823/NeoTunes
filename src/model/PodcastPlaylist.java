@@ -6,7 +6,7 @@ public class PodcastPlaylist extends Playlist {
         super(name);
     }
 
-    @Override public void calculateId() {
+    @Override public String calculateId() {
         int[][] matrixId = super.getMatrixId();
         // only podcasts - t
         String newId = "";
@@ -19,13 +19,13 @@ public class PodcastPlaylist extends Playlist {
                 newId += matrixId[0][i];
             }
         }
-        setId(newId);
+        return newId;
     }
 
     @Override
-    public void addAudio(Audio newAudio) {
-        if(searchAudio(newAudio) != null) throw new IllegalArgumentException("Audio is already in playlist");
-        if(!(newAudio instanceof Podcast)) throw new IllegalArgumentException("This playlist only supports podcasts");
-        getAudios().add(newAudio);
+    public boolean addAudio(Audio newAudio) {
+        if(searchAudio(newAudio) != null) return false;
+        if(!(newAudio instanceof Podcast)) return false;
+        return getAudios().add(newAudio);
     }
 }

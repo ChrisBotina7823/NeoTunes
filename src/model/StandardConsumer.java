@@ -24,17 +24,17 @@ public class StandardConsumer extends Consumer implements Advertisable {
     // PLAYLISTS AND SONGS
 
     @Override
-    public void addPlaylist(Playlist newPlaylist) {
-        if(super.getPlaylists().size() >= 20 || searchPlaylist(newPlaylist.getId()) != null) throw new IllegalArgumentException("Max amount of playlist reached");
-        super.getPlaylists().add(newPlaylist);
+    public boolean addPlaylist(Playlist newPlaylist) {
+        if(super.getPlaylists().size() >= 20 || searchPlaylist(newPlaylist.getId()) != null) return false;
+        return super.getPlaylists().add(newPlaylist);
     }
 
     @Override
     public boolean addSong(Song newSong) {
-        if(super.getPlaylists().size() > 100 || searchSong(newSong.getName()) != null) return false;
-        getSongs().add(newSong);
+        if(super.getPlaylists().size() > 100) return false;
+        if(searchSong(newSong.getName()) != null) return false;
         newSong.increaseNumberOfSales();
-        return true;
+        return getSongs().add(newSong);
     }
 
     @Override
