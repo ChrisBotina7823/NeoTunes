@@ -73,30 +73,16 @@ public class Manager {
      * </pre>
      */
     public void registerProducer() {
-        String[] info; int type;
-        String name, pictureUrl; // attributes
+        System.out.println("Enter the type (1.artist, 2.Content creator)");
+        System.out.print("type: ");
+        int type = sc.nextInt();
 
-        // getting information
-        System.out.print("""
-                \n<<< Producer Registration >>>
-                
-                Enter the following information in the given format (separated by " , "):
-                
-                 | producerType | Allowed: Artist(1), ContentCreator(2).
-                 | name         | identifier for the user, it is unique in the platform.
-                 | pictureUrl   | A picture that represents the new user.
-                
-                Example: "1 , The Score , theScore.jpg"
-                
-                Info:\s""");
-        info = sc.nextLine().split(" , ");
+        sc.nextLine();
+        System.out.print("Enter the producer name: ");
+        String name = sc.nextLine();
 
-        try { // parsing
-            type = Integer.parseInt(info[0]); name = info[1]; pictureUrl = info[2];
-        } catch(Exception e) {
-            System.out.println("\nError: Invalid format");
-            return;
-        }
+        System.out.print("Enter the picture url: ");
+        String pictureUrl = sc.nextLine();
 
         switch(type) {
             case 1 -> {
@@ -118,7 +104,6 @@ public class Manager {
         }
         System.out.println("\nProducer registered successfully");
         System.out.println(controller.showUsers(1));
-
     }
 
     /**
@@ -127,30 +112,15 @@ public class Manager {
      * </pre>
      */
     public void registerConsumer() {
-        String[] info; int type;
-        String nickName, documentId; // attributes
+        System.out.println("Enter the type (1.standard, 2.premium)");
+        System.out.print("type: ");
+        int type = sc.nextInt();
 
-        // getting information
-        System.out.print("""
-                \n<<< Consumer Registration >>>
-                
-                Enter the following information in the given format (separated by " , "):
-                
-                 | consumerType | Allowed: Standard(1), Premium(2).
-                 | nickname     | identifier for the user, it is unique in the platform.
-                 | document     | The document of the new user.
-                
-                Example: "1 , Yuluka , 1587495621"
-                
-                Info:\s""");
-        info = sc.nextLine().split(" , ");
+        System.out.print("Enter the consumer nickname: ");
+        String nickName = sc.nextLine();
 
-        try { // parsing
-            type = Integer.parseInt(info[0]); nickName = info[1]; documentId = info[2];
-        } catch(Exception e) {
-            System.out.println("\nError: Invalid format");
-            return;
-        }
+        System.out.print("Enter the document ID: ");
+        String documentId = sc.nextLine();
 
         switch(type) {
             case 1 -> {
@@ -179,59 +149,48 @@ public class Manager {
      * <strong>Description:</strong> It allows the user to create a new song and add it to an existing artist’s song list.
      * </pre>
      */
-    public void registerAudio() {
+    public void registerAudio()
+    {
         if(controller.showUsers(1).equals("")) {
             System.out.println("\nFirst add a producer");
             return;
         }
-        String[] info; int type;
-        String name, pictureUrl, producerId; int duration ; // general attributes
 
-        // getting information
-        System.out.printf("""
-                \n<<< Audio Registration >>>
-                
-                Enter the following information in the given format (separated by " , "):
-                
-                 | audioType                | Allowed: Song(1), Podcast(2).
-                 | name                     | identifier for the audio, it is unique in the platform.
-                 | pictureUrl               | Picture that represents the song or podcast
-                 | duration                 | Duration written in hh:mm:ss (mm:ss for songs).
-                 | genre or category        | The song genre or podcast category number.
-                    - Podcast Categories:   | %s
-                    - Song Genres:          | %s
-                 | album or description     | The name of the song album, or the podcast description.
-                 | producerId               | The name of the producer.
-                 | sale value (for song)    | The song sale value.
-                 %s
-                 
-                Example: "1 , bones , bones.jpg , 03:15 , 1 , Mercury , Imagine Dragons , 5.24"
-                
-                Info:\s""", controller.showPodcastCategories(), controller.showSongGenres(), controller.showUsers(1));
-        info = sc.nextLine().split(" , ");
+        System.out.println("Enter the audio type (1.song, 2.podcast");
+        System.out.print("type: ");
+        int type = sc.nextInt();
 
-        try { // parsing general
-            type = Integer.parseInt(info[0]);
-            name = info[1];
-            pictureUrl = info[2];
-            duration = parseDuration(info[3]);
-            producerId = info[6];
+        System.out.print("Enter the audio name:");
+        String name = sc.nextLine();
+
+        System.out.print("Enter the picture url:");
+        String pictureUrl = sc.nextLine();
+
+        int duration;
+        System.out.print("Enter the duration (hh:mm:ss) or (mm:ss):");
+        try {
+            duration = parseDuration(sc.nextLine());
         } catch(Exception e) {
-            System.out.println("\nError: Invalid format");
+            System.out.println("Invalid format");
             return;
         }
 
+        System.out.println(controller.showUsers(1));
+        System.out.print("Enter the producer name:");
+        String producerId = sc.nextLine();
+
         switch (type) {
             case 1 -> {
-                String album; int genre; double saleValue;
-                try { // parsing song attributes
-                    album = info[5];
-                    genre = Integer.parseInt(info[4]);
-                    saleValue = Double.parseDouble(info[7]);
-                } catch(Exception e) {
-                    System.out.println("\nError: Invalid format");
-                    return;
-                }
+                System.out.printf("Enter the genre: %s", controller.showSongGenres());
+                System.out.print("genre: ");
+                int genre = sc.nextInt();
+
+                System.out.print("Enter the album: ");
+                String album = sc.nextLine();
+
+                System.out.print("Enter the album: ");
+                double saleValue = sc.nextDouble();
+
                 if(!controller.registerSong(name, pictureUrl, duration, genre, album, saleValue, producerId)) {
                     System.out.println("\nError registering song");
                     return;
@@ -239,14 +198,13 @@ public class Manager {
 
             }
             case 2 -> {
-                String description; int category;
-                try { // parsing podcast attributes
-                    description = info[5];
-                    category = Integer.parseInt(info[4]);
-                } catch (Exception e) {
-                    System.out.println("\nError: Invalid format");
-                    return;
-                }
+                System.out.printf("Enter the category: %s", controller.showPodcastCategories());
+                System.out.print("genre: ");
+                int category = sc.nextInt();
+
+                System.out.print("Enter the description: ");
+                String description = sc.nextLine();
+
                 if(!controller.registerPodcast(name, pictureUrl, duration, category, description, producerId)) {
                     System.out.println("\nError registering podcast");
                     return;
@@ -255,7 +213,7 @@ public class Manager {
             default -> throw new IllegalArgumentException("Invalid audio type");
         }
         System.out.println("\nAudio registered successfully");
-        System.out.println(controller.showCatalogue());
+        System.out.println(controller.showCatalogue(0));
     }
 
     /**
@@ -268,35 +226,15 @@ public class Manager {
             System.out.println("\nFirst add a consumer");
             return;
         }
-        String[] info; int type;
-        String name, consumerName; // general attributes
 
-        // getting information
-        System.out.printf("""
-                \n<<< Playlist Registration >>>
-                
-                Enter the following information in the given format (separated by " , "):
-                
-                 | playlistType            | Allowed: AllAudios(1), OnlyPodcast(2), OnlySongs(3).
-                 | playlistName            | Name of the playlist, it is not unique.
-                 | consumerNickname        | Picture that represents the song or podcast
-                 %s
-                 
-                Example: "3 , Workout and programming , Chris78"
-                
-                Info:\s""", controller.showUsers(2));
-        info = sc.nextLine().split(" , ");
+        System.out.println(controller.showUsers(2));
+        System.out.print("Enter the consumer name: ");
+        String consumerName = sc.nextLine();
 
-        try { // parsing general
-            type = Integer.parseInt(info[0]);
-            name = info[1];
-            consumerName = info[2];
-        } catch(Exception e) {
-            System.out.println("\nError: Invalid format");
-            return;
-        }
+        System.out.print("Enter the playlist name: ");
+        String name = sc.nextLine();
 
-        if(controller.registerPlaylist(consumerName, type, name)) {
+        if(controller.registerPlaylist(consumerName, name)) {
             System.out.println("\nError adding playlist");
             return;
         }
@@ -318,60 +256,48 @@ public class Manager {
             return;
         }
 
-        String[] info; int operation;
-        String newName, id, consumerName; // general attributes
-
-        System.out.print("""
-                \nEnter the nickname of the consumer that owns the playlist
-                Name:\s""");
-        consumerName = sc.nextLine();
-
+        System.out.println(controller.showUsers(2));
+        System.out.print("Enter the consumer name: ");
+        String consumerName = sc.nextLine();
         if(controller.showConsumerPlaylists(consumerName).equals("")) {
-            System.out.printf("%nThe consumer %s does not have playlist", consumerName);
+            System.out.printf("%nThe consumer %s does not have playlists", consumerName);
         }
 
-        // getting information
-        System.out.printf("""
-                \n<<< Playlist Editing >>>
-                
-                Enter the following information in the given format (separated by " , "):
-                
-                 | playlistId              | Name of the playlist, it is unique.
-                 | operation               | Allowed: AddSong(1) , RemoveSong(2) , RenamePlaylist(3)
-                 | audio name or new name  | Audio name for adding and removing. Playlist name for renaming.
-                 %s
-                 
-                Examples: "5874596857485126 , 1 , dreamers"
-                          "1547856598659854 , 3 , Reading songs"
-                
-                Info:\s""", controller.showConsumerPlaylists(consumerName));
-        info = sc.nextLine().split(" , ");
+        System.out.println(controller.showConsumerPlaylists(consumerName));
+        System.out.print("Enter the playlistId: ");
+        String id = sc.nextLine();
 
-        try { // parsing general
-            id = info[0];
-            operation = Integer.parseInt(info[1]);
-            newName = info[2];
-        } catch(Exception e) {
-            System.out.println("\nError: Invalid format");
-            return;
-        }
+        System.out.println("Enter the operation. Allowed: addAudio(1) , removeAudio(2) , RenamePlaylist(3)");
+        System.out.print("Operation: ");
+        int operation = sc.nextInt();
+
+        String name;
+        sc.nextLine();
 
         switch(operation) {
             case 1 -> {
-                if(!controller.addOrRemovePlaylistAudio(1, consumerName, newName, id)) {
+                System.out.println(controller.showCatalogue(0));
+                System.out.print("Enter the name of the audio to add: ");
+                name = sc.nextLine();
+                if(!controller.addOrRemovePlaylistAudio(1, consumerName, name, id)) {
                     System.out.println("\nError adding song to playlist");
                     return;
                 }
             }
             case 2 -> {
-                if(controller.addOrRemovePlaylistAudio(2, consumerName, newName, id)){
+                System.out.println(controller.showPlaylistAudios(id));
+                System.out.print("Enter the name of the audio to remove: ");
+                name = sc.nextLine();
+                if(controller.addOrRemovePlaylistAudio(2, consumerName, name, id)){
                     System.out.println("\nError removing song from playlist");
                     return;
                 }
             }
             case 3 -> {
-                if(controller.renamePlaylist(consumerName, id, newName)) {
-                    System.out.printf("%nError renaming playlist to %s", newName);
+                System.out.print("Enter the new name of tha playlist: ");
+                name = sc.nextLine();
+                if(controller.renamePlaylist(consumerName, id, name)) {
+                    System.out.printf("%nError renaming playlist to %s", name);
                 }
             }
             default -> {
@@ -382,20 +308,157 @@ public class Manager {
         System.out.println("\nPlaylist edited successfully");
         System.out.println(controller.showConsumerPlaylists(consumerName));
     }
+
+    /**
+     * <pre>
+     * <strong>Description:</strong> It allows the user to get the playlist ID and the matrix that generated it, so that other users can access it.
+     * </pre>
+     */
     public void sharePlaylist() {
+        if(controller.showUsers(2).equals("")) {
+            System.out.println("\nFirst add a playlist");
+            return;
+        }
 
+        System.out.println(controller.showUsers(2));
+        System.out.print("Enter the consumerName: ");
+        String consumerName = sc.nextLine();
+
+        if(controller.showConsumerPlaylists(consumerName).equals("")) {
+            System.out.printf("%nThe consumer %s does not have playlists", consumerName);
+        }
+
+        System.out.println(controller.showConsumerPlaylists(consumerName));
+        System.out.print("Enter the playlist name: ");
+        String id = sc.nextLine();
+
+        System.out.println(controller.sharePlaylist(consumerName, id));
     }
+
+    /**
+     * <pre>
+     * <strong>Description:</strong> It allows the user to play any audio that exists in the catalogue.
+     * </pre>
+     */
     public void playAudio() {
+        if(controller.showCatalogue(0).equals("") || controller.showUsers(2).equals("")) {
+            System.out.println("\nThere must be at least a consumer and audio");
+        }
+        // input
+        System.out.println(controller.showUsers(2));
+        System.out.print("Enter the consumer name: ");
+        String consumerName = sc.nextLine();
 
+        System.out.println(controller.showCatalogue(0));
+        System.out.print("Enter the audio name: ");
+        String audioName = sc.nextLine();
+
+        String[] queue = controller.playAudio(consumerName, audioName);
+        if(queue[1].equals("")) {
+            System.out.println("\n Error playing audio");
+            return;
+        }
+
+        for(String audio : queue) {
+            if(!audio.equals("")) {
+                System.out.println(audio);
+                sc.nextLine();
+            }
+        }
     }
-    public void buySong() {
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> It allows the user to select a song from the catalogue and add it to his song list.
+     * </pre>
+     */
+    public void buySong() {
+        if(controller.showCatalogue(1).equals("") || controller.showUsers(2).equals("")) {
+            System.out.println("\nThere must be at least a consumer and audio");
+        }
+        // input
+        System.out.println(controller.showUsers(2));
+        System.out.print("Enter the consumer name: ");
+        String consumerName = sc.nextLine();
+
+        System.out.println(controller.showCatalogue(1));
+        System.out.print("Enter the song name: ");
+        String songName = sc.nextLine();
+
+        if(!controller.buySong(consumerName, songName)) {
+            System.out.println("\nError buying song");
+            return;
+        }
+
+        System.out.println("\nSong bought successfully");
+        System.out.println(controller.showPurchases(consumerName));
     }
 
     // STATISTICS
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> It allows the user to create a new playlist and add it to an existing consumer’s song list, also to the general platform.
+     * </pre>
+     */
     public void showStatistics() {
-
+        int operation;
+        do {
+            System.out.print("""
+                    \nSelect the operation:
+                    0. Go back
+                    1. Total of plays per type
+                    2. Most played song genre per user and platform
+                    3. Most played podcast category per user and platform
+                    4. Producers’ top 5 information per type
+                    5. Audio’s top 10 information per type
+                    6. Song total sales per genre
+                    7. Best seller song’s total sales
+                    8. Total plays per type
+                    """);
+            operation = -1;
+            while(operation < 0 || operation > 8) {
+                try {
+                    System.out.print("Option: ");
+                    operation = Integer.parseInt(sc.nextLine());
+                } catch(Exception e) {
+                    System.out.println("");
+                }
+            }
+            switch (operation) {
+                case 0 -> System.out.print("");
+                case 1 -> {
+                    System.out.println("\n" + controller.mostPlayedSongGenre());
+                    System.out.println("\n" + controller.mostPlayedPodcastCategory());
+                }
+                case 2 -> {
+                    System.out.println(controller.showUsers(2));
+                    System.out.print("Enter the name of the consumer or press enter for the whole platform: ");
+                    String consumerName = sc.nextLine();
+                    if(consumerName.equals("")) {
+                        System.out.println(controller.mostPlayedSongGenre());
+                    } else {
+                        System.out.println(controller.mostPlayedSongGenre(consumerName));
+                    }
+                }
+                case 3 -> {
+                    System.out.println(controller.showUsers(2));
+                    System.out.print("Enter the name of the consumer or press enter for the whole platform: ");
+                    String consumerName = sc.nextLine();
+                    if(consumerName.equals("")) {
+                        System.out.println(controller.mostPlayedPodcastCategory());
+                    } else {
+                        System.out.println(controller.mostPlayedPodcastCategory(consumerName));
+                    }
+                }
+                case 4 -> System.out.println(controller.showProducersTop(5));
+                case 5 -> System.out.println(controller.showAudiosTop(10));
+                case 6 -> System.out.println(controller.showTotalSalesPerGenre());
+                case 7 -> System.out.println(controller.bestSellerInformation());
+                case 8 -> System.out.println(controller.showTotalPlaysPerType());
+                default -> System.out.println("\nEnter a valid option");
+            }
+        } while(operation != 0);
     }
 
     // UTILITIES

@@ -53,6 +53,7 @@ public abstract class Consumer extends User {
      * <strong>Description: </strong> It adds a new playlist to the consumer's playlists collection, ensuring that it is not already in it.
      * <strong>pre:</strong> playlists <strong>ArrayList</strong> must be initialized
      * @param newPlaylist <strong>Playlist</strong> the playlist that is going to be added to the list
+     * @return status <strong>boolean</strong> it returns true if the playlist could be added to the collection
      * </pre>
      */
     public abstract boolean addPlaylist(Playlist newPlaylist);
@@ -61,7 +62,7 @@ public abstract class Consumer extends User {
      * <pre>
      * <strong>Description:</strong> It searches and returns the found playlist based on its id
      * <strong>pre:</strong> playlists <strong>ArrayList</strong> must be initialized
-     * @param id <strong>String</strong> target playlist unique identifier
+     * @param id <strong>String</strong> target playlist unique identifier.
      * @return foundPlaylist <strong>Audio</strong> the playlist that matches with the id
      * </pre>
      */
@@ -82,15 +83,7 @@ public abstract class Consumer extends User {
     public String showPlaylists() {
         String playlistList = "";
         for(Playlist playlist : playlists) {
-            playlistList += "\n - " + playlist.getName() + " (id='" + playlist.getId() + "')";
-            if(playlist instanceof SongPlaylist) {
-                playlistList += " [songs]";
-            } else if(playlist instanceof PodcastPlaylist) {
-                playlistList += " [podcasts]";
-            } else {
-                playlistList += " [all]";
-            }
-            playlistList += "\n\tAudios: " + playlist.showAudios() ;
+            playlistList += "\n - " + playlist.getName() + " [currentId = " + playlist.getId() + "]" + " (audios: " + playlist.getAudios().size() + ")";
         }
         return (playlists.isEmpty()) ? ("") : ("\n--- " + this.nickname + " Playlists ---" + playlistList);
     }
@@ -122,12 +115,25 @@ public abstract class Consumer extends User {
 
 
     // INTERACTION
-
+    /**
+     * <pre>
+     * <strong>Description: </strong> It registers an new playback and increases the audio's number of plays.
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized
+     * @param tmpAudio <strong>Audio</strong> the audio that is going to be played
+     * </pre>
+     */
     public void playAudio(Audio tmpAudio) {
         playbacks.add(new Record(this.nickname, tmpAudio));
-        tmpAudio.increaseNumberOfPlays();
+        tmpAudio.setNumberOfPlays(tmpAudio.getNumberOfPlays()+1);
     }
 
+    /**
+     * <pre>
+     * <strong>Description: </strong> It selects the most played song genre based on the count that playsPerAudioType method returns
+     * @return mostPlayedGenre <strong>int[]</strong> The index of the max genre and the number of plays it has.
+     * </pre>
+     */
     public int[] mostPlayedSongGenre() {
         int[] playsPerSongType = countPlaysPerAudioType()[0];
         int maxGenre = 0;
@@ -136,6 +142,13 @@ public abstract class Consumer extends User {
         }
         return new int[]{maxGenre, playsPerSongType[maxGenre]};
     }
+
+    /**
+     * <pre>
+     * <strong>Description: </strong> It selects the most played song genre based on the count that playsPerAudioType method returns
+     * @return mostPlayedCategory <strong>int[]</strong> The index of the max category and the number of plays it has.
+     * </pre>
+     */
     public int[] mostPlayedPodcastCategory() {
         int[] playsPerPodcastCategory = countPlaysPerAudioType()[1];
         int maxCategory = 0;
@@ -145,6 +158,14 @@ public abstract class Consumer extends User {
         return new int[]{maxCategory, playsPerPodcastCategory[maxCategory]};
     }
 
+    /**
+     * <pre>
+     * <strong>Description: </strong> It counts the number of plays that each audio type has, both podcast category and song category.
+     * <strong>Pre: </strong> playbacks <strong>ArrayList</strong> Must be initialized
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized
+     * @return mostPlayedGenre <strong>int[]</strong> A bidimensional array, the first position contains an array of plays per song genre and the second an array of plays per podcast category
+     * </pre>
+     */
     public int[][] countPlaysPerAudioType() {
         int[] playsPerSongGenre = new int[SongGenre.values().length];
         int[] playsPerPodcastCategory = new int[PodcastCategory.values().length];
@@ -167,6 +188,13 @@ public abstract class Consumer extends User {
         return new int[][]{playsPerSongGenre, playsPerPodcastCategory};
     }
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> Returns the list of playback records that a consumer has
+     * <strong>pre:</strong> playbacks <strong>ArrayList</strong> must be initialized
+     * @return playbackList <strong>String</strong> a readable list of playbacks
+     * </pre>
+     */
     public String showPlaybacks() {
         String playbackList = "";
         for(Record playback : playbacks) {
@@ -174,7 +202,6 @@ public abstract class Consumer extends User {
         }
         return (playbacks.isEmpty()) ? ("") : ("\n--- " + this.nickname + " Playbacks ---" + playbackList);
     }
-
 
     @Override
     public String toString() {

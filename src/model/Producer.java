@@ -43,7 +43,13 @@ public abstract class Producer extends User {
      * @return audioList <strong>String</strong> a readable list of audios
      * </pre>
      */
-    public abstract String showAudios();
+    public String showAudios() {
+        String audioList = "";
+        for(Audio audio: audios) {
+            audioList += "\n" + audio;
+        }
+        return audioList;
+    }
 
     /**
      * <pre>
@@ -52,7 +58,7 @@ public abstract class Producer extends User {
      * @param newAudio <strong>Audio</strong> the audio that is going to be added to the list
      * </pre>
      */
-    public abstract void addAudio(Audio newAudio);
+    public abstract boolean addAudio(Audio newAudio);
 
     /**
      * <pre>
@@ -62,13 +68,44 @@ public abstract class Producer extends User {
      * @return foundAudio <strong>Audio</strong> the audio that matches with the name, song for artists, podcast for content creators
      * </pre>
      */
-    public abstract Audio searchAudio(String name);
+    public Audio searchAudio(String name) {
+        for(Audio audio : audios) {
+            if(audio.getName().equals(name)) return audio;
+        }
+        return null;
+    }
 
     // STATISTICS
 
-    public abstract int getTotalPlays();
+    /**
+     * <pre>
+     * <strong>Description: </strong> Counts the total of plays of each audio that the producer owns
+     * <strong>Pre: </strong> audios <strong>ArrayList</strong> Must be initialized
+     * @return totalPlays <strong>int</strong> The total amount of plays that the producer audios have
+     * </pre>
+     */
+    public int getTotalPlays() {
+        int totalPlays = 0;
+        for(Audio audio: audios) {
+            totalPlays += audio.getNumberOfPlays();
+        }
+        return totalPlays;
+    }
 
-    public abstract int getTotalTimePlayed();
+    /**
+     * <pre>
+     * <strong>Description: </strong> Counts the total of plays of each audio that the producer owns and multiplies it to the duration of each one
+     * <strong>Pre: </strong> audios <strong>ArrayList</strong> Must be initialized
+     * @return totalTimePlayed <strong>int</strong> The total amount of time played for producer's audios
+     * </pre>
+     */
+    public int getTotalTimePlayed() {
+        int timePlayed = 0;
+        for(Audio audio: audios) {
+            timePlayed += audio.getNumberOfPlays() * audio.getDuration();
+        }
+        return timePlayed;
+    }
 
     @Override
     public String toString() {

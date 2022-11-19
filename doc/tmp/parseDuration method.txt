@@ -1,0 +1,20 @@
+    // UTILITIES
+
+    /**
+     * <pre>
+     * <strong>Description: </strong> It parses a text that represents an audio duration to seconds
+     * @param durationStr <strong>String</strong> Duration in format hh:mm:ss or mm:ss
+     * @return duration <strong>int</strong> duration in seconds
+     * </pre>
+     */
+    public int parseDuration(String durationStr) throws Exception {
+        int duration = 0;
+        String[] durationArr =  durationStr.split(":");
+        for(int i=0, j=durationArr.length-1; i<durationArr.length; i++) {
+            int durationInt = Integer.parseInt(durationArr[i]);
+            if(durationInt >= 60 || durationInt < 0) throw new Exception();
+            duration += Integer.parseInt(durationArr[i]) * Math.pow(60,j);
+            j--;
+        }
+        return duration;
+    }

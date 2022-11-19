@@ -6,46 +6,18 @@ public class Artist extends Producer {
         super(name, pictureUrl);
     }
 
-
+    /**
+     * <pre>
+     * <strong>Description: </strong> It adds a new song to the artist's song collection
+     * <strong>Pre: </strong> audios <strong>ArrayList</strong> Must be initialized
+     * <strong>Pos: </strong> audios <strong>ArrayList</strong> Will be modified with a new audio in it
+     * @param newAudio <strong>Audio</strong> the audio that is going to be added to the list
+     * @return status <strong>boolean</strong> will be true if the audio is added successfully
+     * </pre>
+     */
     @Override
-    public void addAudio(Audio newAudio) {
-        getAudios().add( newAudio );
+    public boolean addAudio(Audio newAudio) {
+        if(!(newAudio instanceof Song)) return false;
+        return getAudios().add( newAudio );
     }
-
-    @Override
-    public Audio searchAudio(String name) {
-        for(Audio song : getAudios()) {
-            if(song.getName().equals(name)) return song;
-        }
-        return null;
-    }
-
-    @Override
-    public String showAudios() {
-        String songList = "";
-
-        for(Audio song : getAudios()) {
-            songList += "\n - " + song.getName() + " by " + this.getName();
-        }
-        return songList;
-    }
-
-    @Override
-    public int getTotalPlays() {
-        int totalPlays = 0;
-        for(Audio song: getAudios()) {
-            totalPlays += song.getNumberOfPlays();
-        }
-        return totalPlays;
-    }
-
-    @Override
-    public int getTotalTimePlayed() {
-        int totalTimePlayed = 0;
-        for(Audio song : getAudios()) {
-            totalTimePlayed += song.getDuration();
-        }
-        return totalTimePlayed;
-    }
-
 }

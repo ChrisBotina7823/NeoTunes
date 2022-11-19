@@ -8,13 +8,12 @@ public class Playlist {
     private String id;
     private int[][] matrixId;
     private ArrayList<Audio> audios;
+    private PlaylistType type;
 
     public Playlist(String name) {
         this.name = name;
         this.audios = new ArrayList<>();
-        this.matrixId = new int[6][6];
-        calculateMatrixId();
-        this.id = calculateId();
+        updateId();
     }
 
     // GETTERS AND SETTERS
@@ -43,8 +42,26 @@ public class Playlist {
     public void setAudios(ArrayList<Audio> audios) {
         this.audios = audios;
     }
+    public PlaylistType getType() {
+        return type;
+    }
+    public void setType(PlaylistType type) {
+        this.type = type;
+    }
 
     // MATRIX AND ID
+
+    /**
+     * <pre>
+     * <strong>Description: </strong> Updates the id by generating a new matrix and, therefore, a new code.
+     * <strong>Pos: </strong> matrixId <strong>int[]</strong> Each position will be filled with a random value
+     * <strong>Pos: </strong> id <strong>String</strong> Will be changed or initialized to the new generated id.
+     * </pre>
+     */
+    public void updateId() {
+        this.matrixId = generateRandomMatrix(6);
+        this.id = calculateId();
+    }
 
     /**
      * <pre>
@@ -53,13 +70,69 @@ public class Playlist {
      * <strong>Pos: </strong> matrixId <strong>int[]</strong> Each position will be filled with a random value
      * </pre>
      */
-    public void calculateMatrixId() {
+    public int[][] generateRandomMatrix(int size) {
+        int[][] matrix = new int[size][size];
         Random rnd = new Random();
-        for(int i=0; i<matrixId.length; i++) {
-            for(int j=0; j<matrixId[i].length; j++) {
-                matrixId[i][j] = rnd.nextInt(9);
+        for(int i=0; i<size; i++) {
+            for(int j=0; j<size; j++) {
+                matrix[i][j] = rnd.nextInt(9);
             }
         }
+        return matrix;
+    }
+
+    /**
+     * <pre>
+     * <strong>Description: </strong> It calculates the unique id of the playlist based on a pattern in the matrix.
+     * For Only songs it is an N, Only Podcasts is a T, and AllAudios is the odd sums of rows and columns greater than 1
+     * <strong>Pre: </strong> matrixId <strong>int[]</strong> Must be initialized and filled with random values
+     * <strong>Pos: </strong> id <strong>String</strong> Will be updated with the new calculated value
+     * @return newId <strong>String</strong> The new id for the playlist
+     * </pre>
+     */
+    public String calculateId() {
+        String newId = "";
+        boolean onlySongs = true, onlyPodcasts = true;
+        if(audios.size() == 0) {
+            onlySongs = false;
+            onlyPodcasts = false;
+        }
+        for(Audio audio: audios) {
+            if(audio instanceof Song) onlyPodcasts = false;
+            if(audio instanceof Podcast) onlySongs = false;
+        }
+
+        if(onlySongs) { // N shape
+            setType(PlaylistType.SONGS);
+            for(int i=0; i<matrixId.length; i++) {
+                if(i == 0 || i == matrixId.length-1) {
+                    for(int j=matrixId.length-1; j>=0; j--) {
+                        newId += matrixId[j][i];
+                    }
+                } else {
+                    newId += matrixId[i][i];
+                }
+            }
+        } else if(onlyPodcasts) { // T shape
+            setType(PlaylistType.PODCAST);
+            for(int i=0; i<matrixId.length; i++) {
+                if(i == 2) {
+                    for (int[] ints : matrixId) newId += ints[i];
+                } else if(i == 3) {
+                    for(int j=matrixId.length-1; j>=0; j--) newId += matrixId[j][i];
+                } else {
+                    newId += matrixId[0][i];
+                }
+            }
+        } else { // sum of odd numbers (greater than 1)
+            setType(PlaylistType.ALL);
+            for(int i=matrixId.length-1; i>=0; i--) {
+                for(int j=matrixId[i].length-1; j>=0; j--) {
+                    if( ( (i+j)%2 != 0 ) && ( (i+j) > 1 ) ) newId += matrixId[i][j];
+                }
+            }
+        }
+        return newId;
     }
 
     /**
@@ -78,27 +151,6 @@ public class Playlist {
             }
         }
         return matrixStr;
-    }
-
-
-    /**
-     * <pre>
-     * <strong>Description: </strong> It calculates the unique id of the playlist based on a pattern in the matrix.
-     * For Only songs it is an N, Only Podcasts is a T, and AllAudios is the odd sums of rows and columns greater than 1
-     * <strong>Pre: </strong> matrixId <strong>int[]</strong> Must be initialized and filled with random values
-     * <strong>Pos: </strong> id <strong>String</strong> Will be updated with the new calculated value
-     * @return newId <strong>String</strong> The new id for the playlist
-     * </pre>
-     */
-    public String calculateId() {
-        // songs and podcasts
-        String newId = "";
-        for(int i=matrixId.length-1; i>=0; i--) {
-            for(int j=matrixId[i].length-1; j>=0; j--) {
-                if( ( (i+j)%2 != 0 ) && ( (i+j) > 1 ) ) newId += matrixId[i][j];
-            }
-        }
-        return newId;
     }
 
     // AUDIOS
@@ -160,10 +212,11 @@ public class Playlist {
 
     @Override
     public String toString() {
-        return "----- Playlist information -----" +
-                "\nname = '" + name + '\'' +
-                "\nid = '" + id + '\'' +
-                showMatrixId(matrixId) +
-                "";
+        return "Playlist{" +
+                "\nname='" + name + '\'' +
+                "\naudios=" + audios.size() +
+                "\ntype=" + type +
+                "\nnewId='" + id + '\'' + showMatrixId(matrixId) +
+                "\n}";
     }
 }

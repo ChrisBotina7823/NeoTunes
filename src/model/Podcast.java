@@ -6,27 +6,43 @@ public class Podcast extends Audio {
 
     public Podcast(String producerId, String name, String pictureUrl, int duration, int category, String description) {
         super(name, pictureUrl, duration, producerId);
-        if(category < 0 || category >= PodcastCategory.values().length) {
-            String msg = "Select a category within the range (1 to " + PodcastCategory.values().length + ")";
-            throw new IllegalArgumentException(msg);
-        } else {
-            this.category = PodcastCategory.values()[category];
-        }
+        this.category = PodcastCategory.values()[category];
         this.description = description;
     }
+
+    // GETTERS AND SETTERS
 
     public PodcastCategory getCategory() {
         return category;
     }
-
     public void setCategory(PodcastCategory category) { this.category = category; }
-
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    // PLAYING
+
+    /**
+     * <pre>
+     * <strong>Description: </strong> Prints all podcast information, including parsed duration (hh:mm:ss)
+     * @return playbackInformation <strong>String</strong> The screen that will be shown to the user when he plays an audio
+     * </pre>
+     */
+    @Override
+    public String play() {
+        int hours = getDuration()/3600;
+        int minutes = (getDuration()-hours*3600)/60 ;
+        int seconds = (getDuration()-hours*3600-minutes*60)%60;
+        return String.format("""
+                ======== Playing podcast ========
+                %s • %s [%s]
+                %02d:%02d:%02d left
+                About this podcast: %s
+                ====== Press enter to exit ======
+                """, getName(), getProducerName(), getCategory(), hours, minutes, seconds, getDescription());
     }
 
     @Override
@@ -39,4 +55,5 @@ public class Podcast extends Audio {
                 ", category=" + category +
                 '}';
     }
+
 }

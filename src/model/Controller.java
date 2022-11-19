@@ -7,7 +7,6 @@ import java.util.Random;
 public class Controller {
     private ArrayList<User> users;
     private ArrayList<Playlist> playlists;
-
     private ArrayList<Audio> catalogue;
     private ArrayList<Record> purchases;
 
@@ -19,14 +18,12 @@ public class Controller {
 
     public Controller() {
         this.users = new ArrayList<>();
-        this.users = new ArrayList<>();
         this.playlists = new ArrayList<>();
         this.purchases = new ArrayList<>();
         this.catalogue = new ArrayList<>();
     }
 
     // REGISTRATION METHODS
-
 
     /**
      * <pre>
@@ -39,11 +36,9 @@ public class Controller {
      * </pre>
      */
     public boolean registerContentCreator(String name, String pictureUrl) {
-        if(searchUser(name) != null) return false;
-        ContentCreator newContentCreator = new ContentCreator(name, pictureUrl);
-        return users.add(newContentCreator);
+        if(searchUser(name) instanceof Producer) return false;
+        return users.add(new ContentCreator(name, pictureUrl));
     }
-
 
     /**
      * <pre>
@@ -55,9 +50,8 @@ public class Controller {
      * </pre>
      */
     public boolean registerArtist(String name, String pictureUrl) {
-        if(searchUser(name) != null) return false;
-        Artist newArtist = new Artist(name, pictureUrl);
-        return users.add(newArtist);
+        if(searchUser(name) instanceof Producer) return false;
+        return users.add(new Artist(name, pictureUrl));
     }
 
     /**
@@ -71,9 +65,8 @@ public class Controller {
      * </pre>
      */
     public boolean registerStandardConsumer(String nickname, String documentId) {
-        if(searchUser(nickname) != null) return false;
-        StandardConsumer newStandardConsumer = new StandardConsumer(nickname, documentId);
-        return users.add(newStandardConsumer);
+        if(searchUser(nickname) instanceof Consumer) return false;
+        return users.add(new StandardConsumer(nickname, documentId));
     }
 
     /**
@@ -87,9 +80,8 @@ public class Controller {
      * </pre>
      */
     public boolean registerPremiumConsumer(String nickname, String documentId) {
-        if(searchUser(nickname) != null) return false;
-        PremiumConsumer newPremiumConsumer = new PremiumConsumer(nickname, documentId);
-        return users.add(newPremiumConsumer);
+        if(searchUser(nickname) instanceof Consumer) return false;
+        return users.add(new PremiumConsumer(nickname, documentId));
     }
 
     /**
@@ -113,13 +105,16 @@ public class Controller {
         User foundProducer = searchUser(artistName);
         if(!(foundProducer instanceof Artist)) return false;
 
-        Song newSong = new Song(((Artist)foundProducer).getName(), songName, pictureUrl, duration, genre, album, saleValue);
+        Song newSong = new Song(artistName, songName, pictureUrl, duration, genre, album, saleValue);
+
         if(searchAudio(songName) != null) return false;
 
-        ((Artist)foundProducer).addAudio(newSong);
-        return catalogue.add(newSong);
+        if(((Artist)foundProducer).addAudio(newSong)) {
+            return catalogue.add(newSong);
+        } else {
+            return false;
+        }
     }
-
 
     /**
      * <pre>
@@ -141,13 +136,16 @@ public class Controller {
         User foundProducer = searchUser(contentCreatorName);
         if(!(foundProducer instanceof ContentCreator) ) return false;
 
-        Podcast newPodcast = new Podcast(((ContentCreator)foundProducer).getName(), podcastName, pictureUrl, duration, category, description);
+        Podcast newPodcast = new Podcast(contentCreatorName, podcastName, pictureUrl, duration, category, description);
+
         if(searchAudio(podcastName) != null) return false;
 
-        ((ContentCreator)foundProducer).addAudio(newPodcast);
-        return catalogue.add(newPodcast);
+        if(((ContentCreator)foundProducer).addAudio(newPodcast)) {
+            return catalogue.add(newPodcast);
+        } else {
+            return false;
+        }
     }
-
 
     /**
      * <pre>
@@ -158,19 +156,12 @@ public class Controller {
      * <strong>pos: </strong> foundConsumer <strong>Producer</strong> modified with a new playlist in its list
      * <strong>pos: </strong> playlists <strong>ArrayList</strong> modified with a new playlist in it
      * @param consumerName <strong>String</strong> name of the consumer to which the playlist is going to be added.
-     * @param type <strong>int</strong> type of playlist 1.AllSongs 2.OnlyPodcasts 3.OnlySongs
      * @param name <strong>String</strong> name of the new playlist
      * @return status <strong>boolean</strong> It will be false if the consumer is not found or the consumer playlists list is full
      * </pre>
      */
-    public boolean registerPlaylist(String consumerName, int type, String name) {
-        Playlist newPlaylist = switch (type) {
-            case 1 -> new Playlist(name);
-            case 2 -> new PodcastPlaylist(name);
-            case 3 -> new SongPlaylist(name);
-            default -> null;
-        };
-        if(newPlaylist == null) return false;
+    public boolean registerPlaylist(String consumerName, String name) {
+        Playlist newPlaylist = new Playlist(name);
 
         User tmpConsumer = searchUser(consumerName);
         if(!(tmpConsumer instanceof Consumer) ) return false;
@@ -183,7 +174,6 @@ public class Controller {
     }
 
     // PLAYLIST METHODS
-
 
     /**
      * <pre>
@@ -235,11 +225,24 @@ public class Controller {
         }
     }
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> It shows the id and matrix that generated the
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized and have at least one consumer
+     * <strong>pre: </strong> catalogue <strong>ArrayList</strong> must be initialized and have at least one audio
+     * <strong>pre: </strong> playlists <strong>ArrayList</strong> must be initialized with at least one playlist
+     * <strong>pos: </strong> tmpPlaylist <strong>Playlist</strong> will be modified with a song added or removed from its list
+     * @param consumerName <strong>String</strong> name of the consumer that owns the playlist.
+     * @param playlistId <strong>String</strong> playlist unique identifier
+     * @return tmpPlaylist <strong>String</strong> The written version of the playlist, that includes the id and matrix
+     * </pre>
+     */
     public String sharePlaylist(String consumerName, String playlistId) {
         Consumer tmpConsumer = (Consumer)searchUser(consumerName);
-        if(tmpConsumer == null) return "User not found";
+        if(tmpConsumer == null) return "\nUser not found";
         Playlist tmpPlaylist = searchPlaylist(playlistId);
-        if(tmpPlaylist == null) return "User does not have the playlist";
+        if(tmpPlaylist == null) return "\nUser does not have the playlist";
+        tmpPlaylist.updateId();
         return "\n" + tmpPlaylist;
     }
 
@@ -273,10 +276,10 @@ public class Controller {
         return categoriesList;
     }
 
-
     /**
      * <pre>
      * <strong>Description:</strong> Prints the list of users of the platform. An empty text if there are none.
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized.
      * @param type <strong>int</strong> User type: 0.All, 1.OnlyProducers, 2.OnlyConsumers
      * @return userList <strong>String</strong> a readable list of users
      * </pre>
@@ -285,14 +288,17 @@ public class Controller {
         String userList = "";
         for(User user : users) {
             switch (type) {
-                case 0:
-                    userList += "\n - " + user;
-                    break;
-                case 1:
-                    if(user instanceof Producer) userList += "\n - " + user;
-                    break;
-                case 2:
-                    if(user instanceof Consumer) userList += "\n - " + user;
+                case 0 -> userList += "\n - " + user;
+                case 1 -> {
+                    if(user instanceof Producer) {
+                        userList += "\n - " + user;
+                    }
+                }
+                case 2 -> {
+                    if(user instanceof Consumer) {
+                        userList += "\n - " + user;
+                    }
+                }
             }
         }
         return (userList.equals("")) ? ("") : ((type == 1) ? ("\n--- Producer list ---" + userList) : ("\n--- Consumer list ---" + userList));
@@ -301,29 +307,29 @@ public class Controller {
     /**
      * <pre>
      * <strong>Description:</strong> Prints the list of audios of the platform, that is, the catalogue. An empty text if there are not any audio.
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized.
      * @return catalogueList <strong>String</strong> a readable list of audios
      * </pre>
      */
-    public String showCatalogue() {
+    public String showCatalogue(int type) {
         String catalogueList = "";
 
         for(Audio audio : catalogue) {
-            catalogueList += "\n - " + audio;
+            switch (type) {
+                case 0 -> catalogueList += "\n - " + audio;
+                case 1 -> {
+                    if(audio instanceof Song) {
+                        catalogueList += "\n - " + audio;
+                    }
+                }
+                case 2 -> {
+                    if(audio instanceof Podcast) {
+                        catalogueList += "\n - " + audio;
+                    }
+                }
+            }
         }
         return ( catalogueList.equals("") ) ? ("") : ("\n--- Current Catalogue --- " ) + catalogueList;
-    }
-
-    public String showUserInformation(int userType, String name) {
-        switch (userType) {
-            case 1:
-                Producer foundProducer = (Producer)searchUser(name);
-                return (foundProducer != null) ? foundProducer.toString() : "Producer not found";
-            case 2:
-                Consumer foundConsumer = (Consumer)searchUser(name);
-                return (foundConsumer != null) ? foundConsumer.toString() : "Consumer not found";
-            default:
-                return "";
-        }
     }
 
     /**
@@ -336,27 +342,59 @@ public class Controller {
      */
     public String showConsumerPlaylists(String userName) {
         User matchedConsumer = searchUser(userName);
-        if(!(matchedConsumer instanceof Consumer)) return "";
+        if(!(matchedConsumer instanceof Consumer)) return "\nConsumer not found";
 
         return ((Consumer)matchedConsumer).showPlaylists();
     }
 
-    public String showPurchases() {
+    /**
+     * <pre>
+     * <strong>Description:</strong> Prints the list of purchases, either in the whole platform or for a specified user.
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized.
+     * <strong>Pre: </strong> purchases <strong>ArrayList</strong> Must be initialized.
+     * @param consumerName <strong>int</strong> the name of the consumer if specified, else it will be an empty String.
+     * @return purchasesList <strong>String</strong> a readable list of purchases
+     * </pre>
+     */
+    public String showPurchases(String consumerName) {
         String purchasesList = "";
         for(Record purchase : purchases) {
-            purchasesList += "\n - " + purchase;
+            if(consumerName.equals("") || purchase.getConsumerName().equals(consumerName)) {
+                purchasesList += "\n - " + purchase;
+            }
         }
-        return (purchasesList.equals("")) ? ("") : ("\n--- Purchase history --- " ) + purchasesList;
+        if(purchasesList.equals("")) return purchasesList;
+
+        return ("\n--- Purchase history --- " ) + purchasesList;
     }
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> Prints the list of purchases for a specified user.
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized and have at least one consumer
+     * @param consumerName <strong>int</strong> the name of the consumer to search.
+     * @return playbackList <strong>String</strong> a readable list of consumer's playbacks
+     * </pre>
+     */
     public String showConsumerPlaybacks(String consumerName) {
         Consumer tmpConsumer = (Consumer)searchUser(consumerName);
         if(tmpConsumer == null) return "Consumer not found";
         return tmpConsumer.showPlaybacks();
     }
 
-    // SEARCHING METHODS
+    /**
+     * <pre>
+     * <strong>Description:</strong> Prints the list of audios that a selected playlist has
+     * <strong>pre:</strong> playlists <strong>ArrayList</strong> must be initialized and have at least one consumer
+     * @return audioList <strong>String</strong> a readable list of the playlist's audios
+     * </pre>
+     */
+    public String showPlaylistAudios(String id) {
+        Playlist tmpPlaylist = searchPlaylist(id);
+        return tmpPlaylist.showAudios();
+    }
 
+    // SEARCHING METHODS
 
     /**
      * <pre>
@@ -407,29 +445,51 @@ public class Controller {
         return null;
     }
 
-    // PLAYING
+    // AUDIO METHODS
 
+    /**
+     * <pre>
+     * <strong>Description: </strong> it selects an audio from the list and returns the playback of the audio and an AD if necessary
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized
+     * <strong>Pre: </strong> ADS <strong>Advertisement[]</strong> Must be initialized
+     * <strong>Pos: </strong> tmpAudio <strong>Audio</strong> will be modified with one more play in it
+     * @param consumerName <strong>String</strong> the name of the consumer to search
+     * @param audioName <strong>String</strong> the name of the audio to search
+     * @return queue <strong>String[]</strong> the list of the audios to be played
+     * </pre>
+     */
     public String[] playAudio(String consumerName, String audioName) {
-        String[] audioList = new String[2];
+        String[] queue = new String[2];
         Random rnd = new Random();
         Advertisement advertisement = ADS[rnd.nextInt(ADS.length-1)];
 
-        Consumer tmpConsumer = (Consumer)searchUser(consumerName);
+        User tmpConsumer = searchUser(consumerName);
 
         Audio tmpAudio = searchAudio(audioName);
-        if(tmpConsumer == null || tmpAudio == null) return new String[]{""};
+        if(!(tmpConsumer instanceof Consumer) || tmpAudio == null) return new String[]{"", ""};
 
-        tmpConsumer.playAudio(tmpAudio);
+        ((Consumer)tmpConsumer).playAudio(tmpAudio);
+        queue[1] = tmpAudio.play(); queue[0] = "";
         if(tmpConsumer instanceof Advertisable) {
             if(tmpAudio instanceof Podcast || ( (tmpAudio instanceof Song) && ((Advertisable) tmpConsumer).showAdvertise()) ) {
-                audioList[0] = String.format("Playing advertisement: %s\nDuration %s", advertisement.getName(), advertisement.getDuration());
+                queue[0] = advertisement.play();
             }
         }
-        audioList[1] = String.format("Playing advertisement: %s\nDuration %s", tmpAudio.getName(), tmpAudio.getDuration());;
-        return audioList;
+        return queue;
     }
 
-    // BUYING
+    /**
+     * <pre>
+     * <strong>Description:</strong> It searches a song and add it to the consumer's song collection
+     * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized and have at least one consumer
+     * <strong>pre: </strong> catalogue <strong>ArrayList</strong> must be initialized and have at least one audi
+     * <strong>pos: </strong> songs <strong>Playlist</strong> will be modified with a song added
+     * @param consumerName <strong>String</strong> name of the consumer to search.
+     * @param songName <strong>String</strong> name of the song that is going to be added.
+     * @return status <strong>boolean</strong> It will be false if the audio or consumer are not found, or the consumer's song list is full
+     * </pre>
+     */
     public boolean buySong(String consumerName, String songName) {
         Consumer tmpConsumer = (Consumer)searchUser(consumerName);
         Audio tmpAudio = searchAudio(songName);
@@ -445,27 +505,54 @@ public class Controller {
 
     // STATISTICS
 
-    public String usersMostPlayedSongGenre(String consumerName) {
+    /**
+     * <pre>
+     * <strong>Description:</strong> It calculates the most played song genre for a specified consumer
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized
+     * @param consumerName <strong>String</strong> the name of the consumer to search
+     * @return stats <strong>String</strong> the most played song genre with the number of plays
+     * </pre>
+     */
+    public String mostPlayedSongGenre(String consumerName) {
         String statistics = "";
         Consumer tmpConsumer = (Consumer)searchUser(consumerName);
-        if(tmpConsumer == null) return "not found";
+        if(tmpConsumer == null) return "\n User not found";
 
         int[] maxSong = tmpConsumer.mostPlayedSongGenre();
 
-        statistics += String.format("For user %s: %nMost played song genre: %s (%d plays)", tmpConsumer.getNickname(), SongGenre.values()[maxSong[0]], maxSong[1]);
+        statistics += String.format("\nFor user %s: %nMost played song genre: %s (%d plays)", tmpConsumer.getNickname(), SongGenre.values()[maxSong[0]], maxSong[1]);
         return statistics;
     }
-    public String usersMostPlayedPodcastCategory(String consumerName) {
+
+    /**
+     * <pre>
+     * <strong>Description:</strong> It calculates the most played podcast category for a specified consumer
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized
+     * @param consumerName <strong>String</strong> the name of the consumer to search
+     * @return stats <strong>String</strong> the most played podcast category with the number of plays
+     * </pre>
+     */
+    public String mostPlayedPodcastCategory(String consumerName) {
         String statistics = "";
         Consumer tmpConsumer = (Consumer)searchUser(consumerName);
-        if(tmpConsumer == null) return "not found";
+        if(tmpConsumer == null) return "\nUser not found";
 
         int[] maxPodcast = tmpConsumer.mostPlayedPodcastCategory();
 
-        statistics += String.format("For user %s: %nMost played podcast category: %s (%d plays)", tmpConsumer.getNickname(), PodcastCategory.values()[maxPodcast[0]], maxPodcast[1]);
+        statistics += String.format("\nFor user %s: %nMost played podcast category: %s (%d plays)", tmpConsumer.getNickname(), PodcastCategory.values()[maxPodcast[0]], maxPodcast[1]);
         return statistics;
     }
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> It calculates the most played song genre for the whole platform
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized
+     * @return stats <strong>String</strong> the most played podcast category with the number of plays
+     * </pre>
+     */
     public String mostPlayedSongGenre() {
         int[] playsPerSongGenre = calculateTotalPlaysPerType()[0];
         int maxGenre = 0;
@@ -474,8 +561,21 @@ public class Controller {
                 maxGenre = i;
             }
         }
-        return String.format("Most played Song genre: %s %nNumber of plays : %d", SongGenre.values()[maxGenre], playsPerSongGenre[maxGenre]);
+        if(playsPerSongGenre[maxGenre] > 0) {
+            return String.format("\nMost played Song genre: %s %nNumber of plays : %d", SongGenre.values()[maxGenre], playsPerSongGenre[maxGenre]);
+        } else {
+            return "\nThere must be at least one play to calculate most played genre";
+        }
     }
+
+    /**
+     * <pre>
+     * <strong>Description:</strong> It calculates the most played podcast category for the whole platform
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized
+     * @return stats <strong>String</strong> the most played podcast category with the number of plays
+     * </pre>
+     */
     public String mostPlayedPodcastCategory() {
         int[] playsPerPodcastCategory = calculateTotalPlaysPerType()[1];
         int maxCategory = 0;
@@ -484,14 +584,42 @@ public class Controller {
                 maxCategory = i;
             }
         }
-        return String.format("Most played Podcast category: %s %nNumber of plays : %d", PodcastCategory.values()[maxCategory], playsPerPodcastCategory[maxCategory]);
+        if(playsPerPodcastCategory[maxCategory] > 0) {
+            return String.format("\nMost played Podcast category: %s %nNumber of plays : %d", PodcastCategory.values()[maxCategory], playsPerPodcastCategory[maxCategory]);
+        } else {
+            return "\nThere must be at least one play to calculate most played category";
+        }
     }
 
-
+    /**
+     * <pre>
+     * <strong>Description:</strong> Counts the number of each audio type, podcast and song
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized
+     * @return totalPlaysPerType <strong>int[][]</strong> Bi-dimensional array, 0 represents songs and 1 podcasts
+     * </pre>
+     */
     public int[][] calculateTotalPlaysPerType() {
         int[] playsPerSongGenre = new int[SongGenre.values().length];
         int[] playsPerPodcastCategory = new int[PodcastCategory.values().length];
 
+
+        return new int[][]{playsPerSongGenre, playsPerPodcastCategory};
+    }
+
+    /**
+     * <pre>
+     * <strong>Description:</strong> Shows the total of plays for each audio type, podcast and song
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized
+     * @return stats <strong>String</strong> Total of plays of each audio type
+     * </pre>
+     */
+    public String showTotalPlaysPerType() {
+        // initialization
+        String statistics = "";
+        int[] playsPerSongGenre = calculateTotalPlaysPerType()[0];
+        int[] playsPerPodcastCategory = calculateTotalPlaysPerType()[1];
         // counting
         for(Audio audio : catalogue) {
             if(audio instanceof Song) {
@@ -504,13 +632,6 @@ public class Controller {
                 }
             }
         }
-        return new int[][]{playsPerSongGenre, playsPerPodcastCategory};
-    }
-    public String totalPlaysPerType() {
-        // initialization
-        String statistics = "";
-        int[] playsPerSongGenre = calculateTotalPlaysPerType()[0];
-        int[] playsPerPodcastCategory = calculateTotalPlaysPerType()[1];
         // format
         statistics += "\nTotal plays per Song Genre";
         for(int i=0; i<playsPerSongGenre.length; i++) {
@@ -523,13 +644,37 @@ public class Controller {
         return statistics;
     }
 
-    public void sortProducers() {
-        for(int i = 0; i< users.size(); i++) {
-            for(int j = 1; j< users.size()-i; j++) {
-                if((users.get(j) instanceof Producer && users.get(j-1) instanceof Producer) || ((Producer)users.get(j-1)).getTotalPlays() < ((Producer)users.get(j)).getTotalPlays()) Collections.swap(users, j, j-1);
+    /**
+     * <pre>
+     * <strong>Description:</strong> Generates a copy of the users collection, including only producers and sorting it
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized
+     * @return producers <strong>ArrayList</strong> Sorted producers array
+     * </pre>
+     */
+    public ArrayList<Producer> sortProducers() {
+        ArrayList<Producer> producers = new ArrayList<>();
+        for(User user : users) {
+            if(user instanceof Producer) producers.add((Producer)user);
+        }
+
+        for(int i = 0; i< producers.size(); i++) {
+            for(int j = 1; j< producers.size()-i; j++) {
+                if((producers.get(j-1)).getTotalPlays() < (producers.get(j)).getTotalPlays()) {
+                    Collections.swap(producers, j, j-1);
+                }
             }
         }
+
+        return producers;
     }
+
+    /**
+     * <pre>
+     * <strong>Description:</strong> Sorts the current catalogue based on the number of plays
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized
+     * <strong>Pos: </strong> catalogue <strong>ArrayList</strong> It will be sorted
+     * </pre>
+     */
     public void sortAudios() {
         for(int i=0; i<catalogue.size(); i++) {
             for(int j=1; j<catalogue.size()-i; j++) {
@@ -538,43 +683,65 @@ public class Controller {
         }
     }
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> Shows the producers sorted array from sortProducers method and including a limit
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized
+     * @param limit <strong>int</strong> the number of producers to be shown
+     * @return stats <strong>String</strong> It will be the top if there are enough producers, otherwise, it will return an error message
+     * </pre>
+     */
     public String showProducersTop(int limit) {
         String artistTop = "", contentCreatorTop = "";
-        sortProducers();
-        if(users.size() < limit*2) return String.format("There must be at least %d producers of each type", limit);
-        for(int i=0, ccIndex = 1, aIndex = 1; i<limit*2; i++) {
-            if(users.get(i) instanceof Artist) {
-                artistTop += String.format("%n %d. %s (%d plays)", aIndex, ((Producer)users.get(i)).getName(), ((Producer)users.get(i)).getTotalPlays());
-                aIndex++;
+        int aCount = 0, ccCount = 0;
+        ArrayList<Producer> producerTop = sortProducers();
+        for(int i=0; (ccCount<limit || aCount<limit) && i<producerTop.size(); i++) {
+            if(producerTop.get(i) instanceof Artist && aCount < limit) {
+                artistTop += String.format("%n %d. %s (%d plays)", ++aCount, (producerTop.get(i)).getName(), (producerTop.get(i)).getTotalPlays());
             }
-            if(users.get(i) instanceof ContentCreator) {
-                contentCreatorTop += String.format("%n %d. %s (%d plays)", ccIndex, ((Producer)users.get(i)).getName(), ((Producer)users.get(i)).getTotalPlays());
-                ccIndex++;
+            if(producerTop.get(i) instanceof ContentCreator && ccCount < limit) {
+                contentCreatorTop += String.format("%n %d. %s (%d plays)", ++ccCount, (producerTop.get(i)).getName(), (producerTop.get(i)).getTotalPlays());
             }
         }
-        return String.format("----- Artists Top %d -----%s%n----- Content Creator Top %d -----%s", limit, artistTop, limit, contentCreatorTop);
+        if(aCount < limit || ccCount < limit) return String.format("\nThere must be at least %d producers of each type", limit);
+        return String.format("\n----- Artists Top %d -----%s%n----- Content Creator Top %d -----%s", limit, artistTop, limit, contentCreatorTop);
     }
-    
+
+    /**
+     * <pre>
+     * <strong>Description:</strong> Shows the audios sorted array and including a limit
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized
+     * <strong>Pre: </strong> users <strong>ArrayList</strong> Must be initialized
+     * @param limit <strong>int</strong> the number of producers to be shown
+     * @return stats <strong>String</strong> It will be the top if there are enough producers, otherwise, it will return an error message
+     * </pre>
+     */
     public String showAudiosTop(int limit) {
-        String songTop = "", podcastTop = "";
         sortAudios();
-        if(catalogue.size() < limit*2) return String.format("There must be at least %d audios of each type", limit);
-        for(int i=0, sIndex = 1, pIndex = 1; i<limit*2; i++) {
-            if(catalogue.get(i) instanceof Song) {
+        int sCount = 0, pCount = 0;
+        String songTop = "", podcastTop = "";
+        for(int i=0; (sCount < limit || pCount < limit) && i<catalogue.size(); i++) {
+            if(catalogue.get(i) instanceof Song && sCount < limit) {
                 Audio song = catalogue.get(i);
-                songTop += String.format("%n %d. %s [%s] (%d plays)", pIndex, song.getName(), ((Song)song).getGenre(), song.getNumberOfPlays());
-                pIndex++;
+                songTop += String.format("%n %d. %s [%s] (%d plays)", ++sCount, song.getName(), ((Song)song).getGenre(), song.getNumberOfPlays());
             }
-            if(catalogue.get(i) instanceof Podcast) {
+            if(catalogue.get(i) instanceof Podcast && pCount < limit) {
                 Audio podcast = catalogue.get(i);
-                podcastTop += String.format("%n %d. %s [%s] (%d plays)", sIndex, podcast.getName(), ((Podcast)podcast).getCategory(), podcast.getNumberOfPlays());
-                sIndex++;
+                podcastTop += String.format("%n %d. %s [%s] (%d plays)", ++pCount, podcast.getName(), ((Podcast)podcast).getCategory(), podcast.getNumberOfPlays());
             }
 
         }
-        return String.format("----- Song Top %d -----%s%n----- Podcast Top %d -----%s", limit, songTop, limit, podcastTop);
+        if(sCount < limit || pCount < limit) return String.format("\nThere must be at least %d audios of each type", limit);
+        return String.format("\n----- Song Top %d -----%s%n----- Podcast Top %d -----%s", limit, songTop, limit, podcastTop);
     }
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> Shows the total of sales per song genre
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized
+     * @return stats <strong>String</strong> Total of sales for each song genre
+     * </pre>
+     */
     public String showTotalSalesPerGenre() {
         String totalSales = "";
         int[] salesPerGenre = new int[SongGenre.values().length];
@@ -592,12 +759,18 @@ public class Controller {
         for(int i=0; i<salesPerGenre.length; i++) {
             totalSales += String.format("%n - %s%n   - Sales: %d%n   - Income: $%.2f", SongGenre.values()[i], salesPerGenre[i], incomePerGenre[i]);
         }
-        return String.format("----- Sales per Genre -----%n%s", totalSales);
+        return String.format("\n----- Sales per Genre -----%n%s", totalSales);
     }
 
+    /**
+     * <pre>
+     * <strong>Description:</strong> Shows the information of the best seller song
+     * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized
+     * @return stats <strong>String</strong> Best seller information
+     * </pre>
+     */
     public String bestSellerInformation() {
-        if(catalogue.isEmpty()) return "";
-        Audio bestSeller = catalogue.get(0);
+        Audio bestSeller = null;
         int maxSales = 0;
         for(Audio song : catalogue) {
             if( song instanceof  Song && ((Song)song).getNumberOfSales() > maxSales) {
@@ -605,6 +778,7 @@ public class Controller {
                 maxSales = ((Song) song).getNumberOfSales();
             }
         }
-        return String.format("----- Best seller information -----%n - Name: %s%n - Sales number: %d%n - Income: $%.2f", bestSeller.getName(), ((Song)bestSeller).getNumberOfSales(), ((Song)bestSeller).getTotalIncome());
+        if(bestSeller == null) return "\nThere is not best seller yet";
+        return String.format("\n----- Best seller information -----%n - Name: %s%n - Sales number: %d%n - Income: $%.2f", bestSeller.getName(), ((Song)bestSeller).getNumberOfSales(), ((Song)bestSeller).getTotalIncome());
     }
 }

@@ -6,45 +6,18 @@ public class ContentCreator extends Producer {
         super(name, pictureUrl);
     }
 
+    /**
+     * <pre>
+     * <strong>Description: </strong> It adds a new podcast to the content creator's podcast collection
+     * <strong>Pre: </strong> audios <strong>ArrayList</strong> Must be initialized
+     * <strong>Pos: </strong> audios <strong>ArrayList</strong> Will be modified with a new audio in it
+     * @param newAudio <strong>Audio</strong> the audio that is going to be added to the list
+     * @return status <strong>boolean</strong> will be true if the audio is added successfully
+     * </pre>
+     */
     @Override
-    public void addAudio(Audio newAudio) {
-        getAudios().add( (Audio) newAudio );
-    }
-
-    @Override
-    public String showAudios() {
-        String podcastList = "";
-
-        for(Audio podcast : getAudios()) {
-            podcastList += "\n - " + podcast.getName() + " by " + this.getName();
-        }
-
-        return podcastList;
-    }
-
-    @Override
-    public Audio searchAudio(String name) {
-        for(Audio podcast : getAudios()) {
-            if(podcast.getName().equals(name)) return podcast;
-        }
-        return null;
-    }
-
-    @Override
-    public int getTotalPlays() {
-        int totalPlays = 0;
-        for(Audio podcast : getAudios()) {
-            totalPlays += podcast.getNumberOfPlays();
-        }
-        return totalPlays;
-    }
-
-    @Override
-    public int getTotalTimePlayed() {
-        int totalTimePlayed = 0;
-        for(Audio podcast : getAudios()) {
-            totalTimePlayed += podcast.getDuration();
-        }
-        return totalTimePlayed;
+    public boolean addAudio(Audio newAudio) {
+        if(!(newAudio instanceof Podcast)) return false;
+        return getAudios().add( newAudio );
     }
 }
