@@ -39,7 +39,7 @@ public class Song extends Audio {
     public void increaseNumberOfSales() {
         this.numberOfSales++;
     }
-    public double getTotalIncome() {
+    public double calculateTotalIncome() {
         return numberOfSales * saleValue;
     }
 

@@ -17,6 +17,92 @@ public class Manager {
         manager.showMenu();
     }
 
+    public void test() {
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        // <<<<<<<<<<<<<<< PRODUCER AND CONSUMER REGISTRATION >>>>>>>>>>>>>>>>
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        for(int i=1; i<=10; i++) {
+            try {
+                controller.registerContentCreator("contentCreator"+i, "123"+i);
+                controller.registerArtist("artist"+i, "12"+i);
+                controller.registerPremiumConsumer("premium"+i, "1234"+i);
+                controller.registerStandardConsumer("standard"+i, "12345"+i);
+            } catch(Exception e) {
+                System.out.println(e.getMessage());
+            }
+            /*
+            try { // REPEATED USERS
+                controller.registerContentCreator("contentCreator"+i, "123"+i,"pic");
+                controller.registerArtist("artist"+i, "123"+i,"pic");
+                controller.registerStandardConsumer("premium"+i, "1234"+i);
+                controller.registerPremiumConsumer("premium"+i, "12345"+i);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+             */
+        }
+        // System.out.println(controller.showUsers(0));
+
+
+
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        // <<<<<<<<<<<<<<< SONG AND PODCAST REGISTRATION >>>>>>>>>>>>>>>>>>>>>
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        for(int i=1; i<=5; i++) {
+            try {
+                controller.registerSong("song"+i, "pic", parseDuration("3:48"), 3, "aaa",23, "12"+i);
+                controller.registerPodcast("podcast"+i, "pic", parseDuration("1:59:30"), 3, "aaa","123"+i);
+            } catch(Exception e) {
+                System.out.println(e.getMessage());
+            }
+            try {
+                /*
+                controller.registerSong("song"+i, "pic", "01:30", 1, "aaa",23, "12"+i);
+                controller.registerPodcast("podcast"+i, "pic", "01:30", 1, "aaa","123"+i);
+                 */
+            } catch(Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        // System.out.println(controller.showCatalogue());
+
+
+
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        // <<<<<<<<<<<<<<<<<<<<< PLAYLIST REGISTRATION >>>>>>>>>>>>>>>>>>>>>>>
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        for(int i=0; i<5; i++) {
+            try {
+                controller.registerPlaylist("12341",  "playlist"+i);
+                controller.registerPlaylist("123451",  "playlist"+i);
+            } catch(Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        /*
+        System.out.println(controller.showConsumerPlaylists("123451"));
+        System.out.println(controller.showConsumerPlaylists("12341"));
+         */
+
+
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        // <<<<<<<<<<<<<<<<<<<<< PLAYLIST EDIT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        try {
+            controller.renamePlaylist("12341", controller.getPlaylists().get(0).getId(), "newName1");
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+        try {
+            // standard consumer own playlists with even indexes, playlists for each consumer are: standard, podcast, and song playlists.
+            controller.addOrRemovePlaylistAudio(1,"12341","podcast2",controller.getPlaylists().get(2).getId());
+            controller.addOrRemovePlaylistAudio(2,"12341","podcast2",controller.getPlaylists().get(2).getId());
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+        System.out.println(controller.showConsumerPlaylists("12341"));
+    }
+
     // MENUS
 
     /**
@@ -25,6 +111,13 @@ public class Manager {
      * </pre>
      */
     public void showMenu() {
+        try {
+            controller.registerSong("cc","cc",parseDuration("3:15"),3,"a",4,"aa");
+        } catch(Exception e) {
+            System.out.println("A");
+        }
+
+        System.out.println("\n===== Welcome to NeoTunes! =====");
         int operation;
         do {
             System.out.print("""
@@ -46,7 +139,7 @@ public class Manager {
                     System.out.print("Option: ");
                     operation = Integer.parseInt(sc.nextLine());
                 } catch(Exception e) {
-                    System.out.println("");
+                    System.out.println();
                 }
             }
             switch (operation) {
@@ -73,6 +166,7 @@ public class Manager {
      * </pre>
      */
     public void registerProducer() {
+        System.out.println("\n===== Producer Registration =====");
         System.out.println("Enter the type (1.artist, 2.Content creator)");
         System.out.print("type: ");
         int type = sc.nextInt();
@@ -112,10 +206,12 @@ public class Manager {
      * </pre>
      */
     public void registerConsumer() {
+        System.out.println("\n===== Consumer Registration =====");
         System.out.println("Enter the type (1.standard, 2.premium)");
         System.out.print("type: ");
         int type = sc.nextInt();
 
+        sc.nextLine();
         System.out.print("Enter the consumer nickname: ");
         String nickName = sc.nextLine();
 
@@ -149,25 +245,26 @@ public class Manager {
      * <strong>Description:</strong> It allows the user to create a new song and add it to an existing artist’s song list.
      * </pre>
      */
-    public void registerAudio()
-    {
+    public void registerAudio() {
+        System.out.println("\n===== Audio Registration =====");
         if(controller.showUsers(1).equals("")) {
             System.out.println("\nFirst add a producer");
             return;
         }
 
-        System.out.println("Enter the audio type (1.song, 2.podcast");
+        System.out.println("Enter the audio type (1.song, 2.podcast)");
         System.out.print("type: ");
         int type = sc.nextInt();
 
-        System.out.print("Enter the audio name:");
+        sc.nextLine();
+        System.out.print("Enter the audio name: ");
         String name = sc.nextLine();
 
-        System.out.print("Enter the picture url:");
+        System.out.print("Enter the picture url: ");
         String pictureUrl = sc.nextLine();
 
         int duration;
-        System.out.print("Enter the duration (hh:mm:ss) or (mm:ss):");
+        System.out.print("Enter the duration (hh:mm:ss) or (mm:ss): ");
         try {
             duration = parseDuration(sc.nextLine());
         } catch(Exception e) {
@@ -176,44 +273,45 @@ public class Manager {
         }
 
         System.out.println(controller.showUsers(1));
-        System.out.print("Enter the producer name:");
+        System.out.print("Enter the producer name: ");
         String producerId = sc.nextLine();
 
         switch (type) {
             case 1 -> {
-                System.out.printf("Enter the genre: %s", controller.showSongGenres());
+                System.out.printf("Enter the genre: %s%n", controller.showSongGenres());
                 System.out.print("genre: ");
                 int genre = sc.nextInt();
 
+                sc.nextLine();
                 System.out.print("Enter the album: ");
                 String album = sc.nextLine();
 
-                System.out.print("Enter the album: ");
+                System.out.print("Enter the sale value: ");
                 double saleValue = sc.nextDouble();
 
-                if(!controller.registerSong(name, pictureUrl, duration, genre, album, saleValue, producerId)) {
+                if(!controller.registerSong(name, pictureUrl, duration, genre-1, album, saleValue, producerId)) {
                     System.out.println("\nError registering song");
                     return;
                 }
 
             }
             case 2 -> {
-                System.out.printf("Enter the category: %s", controller.showPodcastCategories());
+                System.out.printf("Enter the category: %s%n", controller.showPodcastCategories());
                 System.out.print("genre: ");
                 int category = sc.nextInt();
 
+                sc.nextLine();
                 System.out.print("Enter the description: ");
                 String description = sc.nextLine();
 
-                if(!controller.registerPodcast(name, pictureUrl, duration, category, description, producerId)) {
+                if(!controller.registerPodcast(name, pictureUrl, duration, category-1, description, producerId)) {
                     System.out.println("\nError registering podcast");
                     return;
                 }
             }
             default -> throw new IllegalArgumentException("Invalid audio type");
         }
-        System.out.println("\nAudio registered successfully");
-        System.out.println(controller.showCatalogue(0));
+        System.out.println("\nAudio registered successfully" + controller.showCatalogue(0));
     }
 
     /**
@@ -222,6 +320,7 @@ public class Manager {
      * </pre>
      */
     public void registerPlaylist() {
+        System.out.println("\n===== Playlist Registration =====");
         if(controller.showUsers(2).equals("")) {
             System.out.println("\nFirst add a consumer");
             return;
@@ -234,7 +333,7 @@ public class Manager {
         System.out.print("Enter the playlist name: ");
         String name = sc.nextLine();
 
-        if(controller.registerPlaylist(consumerName, name)) {
+        if(!controller.registerPlaylist(consumerName, name)) {
             System.out.println("\nError adding playlist");
             return;
         }
@@ -251,6 +350,7 @@ public class Manager {
      * </pre>
      */
     public void editPlaylist() {
+        System.out.println("\n===== Playlist Editing =====");
         if(controller.showUsers(2).equals("")) {
             System.out.println("\nFirst add a playlist");
             return;
@@ -294,7 +394,7 @@ public class Manager {
                 }
             }
             case 3 -> {
-                System.out.print("Enter the new name of tha playlist: ");
+                System.out.print("Enter the new name of the playlist: ");
                 name = sc.nextLine();
                 if(controller.renamePlaylist(consumerName, id, name)) {
                     System.out.printf("%nError renaming playlist to %s", name);
@@ -315,6 +415,7 @@ public class Manager {
      * </pre>
      */
     public void sharePlaylist() {
+        System.out.println("\n===== Playlist Sharing =====");
         if(controller.showUsers(2).equals("")) {
             System.out.println("\nFirst add a playlist");
             return;
@@ -329,7 +430,7 @@ public class Manager {
         }
 
         System.out.println(controller.showConsumerPlaylists(consumerName));
-        System.out.print("Enter the playlist name: ");
+        System.out.print("Enter the playlist id: ");
         String id = sc.nextLine();
 
         System.out.println(controller.sharePlaylist(consumerName, id));
@@ -341,9 +442,11 @@ public class Manager {
      * </pre>
      */
     public void playAudio() {
+        System.out.println("\n===== Audio Playing =====");
         if(controller.showCatalogue(0).equals("") || controller.showUsers(2).equals("")) {
             System.out.println("\nThere must be at least a consumer and audio");
         }
+
         // input
         System.out.println(controller.showUsers(2));
         System.out.print("Enter the consumer name: ");
@@ -355,13 +458,13 @@ public class Manager {
 
         String[] queue = controller.playAudio(consumerName, audioName);
         if(queue[1].equals("")) {
-            System.out.println("\n Error playing audio");
+            System.out.println("\nError playing audio");
             return;
         }
 
         for(String audio : queue) {
             if(!audio.equals("")) {
-                System.out.println(audio);
+                System.out.println("\n" + audio);
                 sc.nextLine();
             }
         }
@@ -373,9 +476,11 @@ public class Manager {
      * </pre>
      */
     public void buySong() {
+        System.out.println("\n===== Song Purchase =====");
         if(controller.showCatalogue(1).equals("") || controller.showUsers(2).equals("")) {
             System.out.println("\nThere must be at least a consumer and audio");
         }
+
         // input
         System.out.println(controller.showUsers(2));
         System.out.print("Enter the consumer name: ");
@@ -402,6 +507,7 @@ public class Manager {
      * </pre>
      */
     public void showStatistics() {
+        System.out.println("\n===== Statistics =====");
         int operation;
         do {
             System.out.print("""
@@ -414,23 +520,19 @@ public class Manager {
                     5. Audio’s top 10 information per type
                     6. Song total sales per genre
                     7. Best seller song’s total sales
-                    8. Total plays per type
                     """);
             operation = -1;
-            while(operation < 0 || operation > 8) {
+            while(operation < 0 || operation > 7) {
                 try {
                     System.out.print("Option: ");
                     operation = Integer.parseInt(sc.nextLine());
                 } catch(Exception e) {
-                    System.out.println("");
+                    System.out.println();
                 }
             }
             switch (operation) {
                 case 0 -> System.out.print("");
-                case 1 -> {
-                    System.out.println("\n" + controller.mostPlayedSongGenre());
-                    System.out.println("\n" + controller.mostPlayedPodcastCategory());
-                }
+                case 1 -> System.out.println("\n" + controller.showTotalPlaysPerType());
                 case 2 -> {
                     System.out.println(controller.showUsers(2));
                     System.out.print("Enter the name of the consumer or press enter for the whole platform: ");
@@ -455,7 +557,6 @@ public class Manager {
                 case 5 -> System.out.println(controller.showAudiosTop(10));
                 case 6 -> System.out.println(controller.showTotalSalesPerGenre());
                 case 7 -> System.out.println(controller.bestSellerInformation());
-                case 8 -> System.out.println(controller.showTotalPlaysPerType());
                 default -> System.out.println("\nEnter a valid option");
             }
         } while(operation != 0);
@@ -467,6 +568,7 @@ public class Manager {
      * <pre>
      * <strong>Description: </strong> It parses a text that represents an audio duration to seconds
      * @param durationStr <strong>String</strong> Duration in format hh:mm:ss or mm:ss
+     * @throws Exception when the String cannot be converted to an integer
      * @return duration <strong>int</strong> duration in seconds
      * </pre>
      */

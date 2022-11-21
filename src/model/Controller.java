@@ -23,6 +23,42 @@ public class Controller {
         this.catalogue = new ArrayList<>();
     }
 
+    public ArrayList<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(ArrayList<User> users) {
+        this.users = users;
+    }
+
+    public ArrayList<Playlist> getPlaylists() {
+        return playlists;
+    }
+
+    public void setPlaylists(ArrayList<Playlist> playlists) {
+        this.playlists = playlists;
+    }
+
+    public ArrayList<Audio> getCatalogue() {
+        return catalogue;
+    }
+
+    public void setCatalogue(ArrayList<Audio> catalogue) {
+        this.catalogue = catalogue;
+    }
+
+    public ArrayList<Record> getPurchases() {
+        return purchases;
+    }
+
+    public void setPurchases(ArrayList<Record> purchases) {
+        this.purchases = purchases;
+    }
+
+    public Advertisement[] getADS() {
+        return ADS;
+    }
+
     // REGISTRATION METHODS
 
     /**
@@ -30,13 +66,13 @@ public class Controller {
      * <strong>Description: </strong> It adds a new content creator to the users' collection, ensuring that it is not already in it.
      * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized
      * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new user in it
-     * @param name new content creator name
-     * @param pictureUrl picture that represents the artist
+     * @param name <strong>String</strong> new content creator name
+     * @param pictureUrl <strong>String</strong> picture that represents the content creator
      * @return status <strong>boolean</strong> It will be false if the content creator is already in the collection
      * </pre>
      */
     public boolean registerContentCreator(String name, String pictureUrl) {
-        if(searchUser(name) instanceof Producer) return false;
+        if(searchUser(name) != null) return false;
         return users.add(new ContentCreator(name, pictureUrl));
     }
 
@@ -45,12 +81,13 @@ public class Controller {
      * <strong>Description: </strong> It adds a new artist to the users' collection, ensuring that it is not already in it.
      * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized
      * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new user in it
-     * @param name new artist name
+     * @param name <strong>String</strong> new artist name
+     * @param pictureUrl <strong>String</strong> picture that represents the artist
      * @return status <strong>boolean</strong> It will be false if the artist is already in the collection
      * </pre>
      */
     public boolean registerArtist(String name, String pictureUrl) {
-        if(searchUser(name) instanceof Producer) return false;
+        if(searchUser(name) != null) return false;
         return users.add(new Artist(name, pictureUrl));
     }
 
@@ -59,13 +96,13 @@ public class Controller {
      * <strong>Description: </strong> It adds a new standard consumer to the users' collection, ensuring that it is not already in it.
      * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized
      * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new user in it
-     * @param nickname new artist name
-     * @param documentId new user's document
+     * @param nickname <strong>String</strong> new artist name
+     * @param documentId <strong>String</strong> new user's document
      * @return status <strong>boolean</strong> It will be false if the standard consumer is already in the collection
      * </pre>
      */
     public boolean registerStandardConsumer(String nickname, String documentId) {
-        if(searchUser(nickname) instanceof Consumer) return false;
+        if(searchUser(nickname) != null) return false;
         return users.add(new StandardConsumer(nickname, documentId));
     }
 
@@ -74,13 +111,13 @@ public class Controller {
      * <strong>Description: </strong> It adds a new premium consumer to the users' collection, ensuring that it is not already in it.
      * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized
      * <strong>pos: </strong> users <strong>ArrayList</strong> modified with a new user in it
-     * @param nickname new artist name
-     * @param documentId new user's document
+     * @param nickname <strong>String</strong> new artist name
+     * @param documentId <strong>String</strong> new user's document
      * @return status <strong>boolean</strong> It will be false if the premium consumer is already in the collection
      * </pre>
      */
     public boolean registerPremiumConsumer(String nickname, String documentId) {
-        if(searchUser(nickname) instanceof Consumer) return false;
+        if(searchUser(nickname) != null) return false;
         return users.add(new PremiumConsumer(nickname, documentId));
     }
 
@@ -164,6 +201,7 @@ public class Controller {
         Playlist newPlaylist = new Playlist(name);
 
         User tmpConsumer = searchUser(consumerName);
+
         if(!(tmpConsumer instanceof Consumer) ) return false;
 
         if(((Consumer)tmpConsumer).addPlaylist(newPlaylist)) {
@@ -308,6 +346,7 @@ public class Controller {
      * <pre>
      * <strong>Description:</strong> Prints the list of audios of the platform, that is, the catalogue. An empty text if there are not any audio.
      * <strong>Pre: </strong> catalogue <strong>ArrayList</strong> Must be initialized.
+     * @param type <strong>int</strong> The type of audios to be displayed (0.all, 1.songs, 2.podcasts)
      * @return catalogueList <strong>String</strong> a readable list of audios
      * </pre>
      */
@@ -337,11 +376,12 @@ public class Controller {
      * <strong>Description:</strong> Prints the list of playlist that a selected consumer has.
      * <strong>pre:</strong> users <strong>ArrayList</strong> must be initialized and have at least one consumer
      * <strong>pre: </strong> playlists <strong>ArrayList</strong> must be initialized and have at least one playlist
+     * @param consumerName <strong>String</strong> The name of the consumer to be searched
      * @return consumerPlaylists <strong>String</strong> a readable list of playlists of the consumer, it will be an empty String if the consumer is not found
      * </pre>
      */
-    public String showConsumerPlaylists(String userName) {
-        User matchedConsumer = searchUser(userName);
+    public String showConsumerPlaylists(String consumerName) {
+        User matchedConsumer = searchUser(consumerName);
         if(!(matchedConsumer instanceof Consumer)) return "\nConsumer not found";
 
         return ((Consumer)matchedConsumer).showPlaylists();
@@ -386,6 +426,7 @@ public class Controller {
      * <pre>
      * <strong>Description:</strong> Prints the list of audios that a selected playlist has
      * <strong>pre:</strong> playlists <strong>ArrayList</strong> must be initialized and have at least one consumer
+     * @param id <strong>String</strong> the playlist unique identifier
      * @return audioList <strong>String</strong> a readable list of the playlist's audios
      * </pre>
      */
@@ -469,13 +510,13 @@ public class Controller {
         Audio tmpAudio = searchAudio(audioName);
         if(!(tmpConsumer instanceof Consumer) || tmpAudio == null) return new String[]{"", ""};
 
-        ((Consumer)tmpConsumer).playAudio(tmpAudio);
         queue[1] = tmpAudio.play(); queue[0] = "";
         if(tmpConsumer instanceof Advertisable) {
-            if(tmpAudio instanceof Podcast || ( (tmpAudio instanceof Song) && ((Advertisable) tmpConsumer).showAdvertise()) ) {
+            if(tmpAudio instanceof Podcast || ( (tmpAudio instanceof Song) && ((Advertisable)tmpConsumer).showAdvertise()) ) {
                 queue[0] = advertisement.play();
             }
         }
+        ((Consumer)tmpConsumer).playAudio(tmpAudio);
         return queue;
     }
 
@@ -659,7 +700,7 @@ public class Controller {
 
         for(int i = 0; i< producers.size(); i++) {
             for(int j = 1; j< producers.size()-i; j++) {
-                if((producers.get(j-1)).getTotalPlays() < (producers.get(j)).getTotalPlays()) {
+                if((producers.get(j-1)).calculateTotalPlays() < (producers.get(j)).calculateTotalPlays()) {
                     Collections.swap(producers, j, j-1);
                 }
             }
@@ -697,10 +738,10 @@ public class Controller {
         ArrayList<Producer> producerTop = sortProducers();
         for(int i=0; (ccCount<limit || aCount<limit) && i<producerTop.size(); i++) {
             if(producerTop.get(i) instanceof Artist && aCount < limit) {
-                artistTop += String.format("%n %d. %s (%d plays)", ++aCount, (producerTop.get(i)).getName(), (producerTop.get(i)).getTotalPlays());
+                artistTop += String.format("%n %d. %s (%d plays)", ++aCount, (producerTop.get(i)).getName(), (producerTop.get(i)).calculateTotalPlays());
             }
             if(producerTop.get(i) instanceof ContentCreator && ccCount < limit) {
-                contentCreatorTop += String.format("%n %d. %s (%d plays)", ++ccCount, (producerTop.get(i)).getName(), (producerTop.get(i)).getTotalPlays());
+                contentCreatorTop += String.format("%n %d. %s (%d plays)", ++ccCount, (producerTop.get(i)).getName(), (producerTop.get(i)).calculateTotalPlays());
             }
         }
         if(aCount < limit || ccCount < limit) return String.format("\nThere must be at least %d producers of each type", limit);
@@ -751,7 +792,7 @@ public class Controller {
                 for(int i=0; i<SongGenre.values().length; i++) {
                     if(((Song) song).getGenre().equals(SongGenre.values()[i])) {
                         salesPerGenre[i] += ((Song) song).getNumberOfSales();
-                        incomePerGenre[i] += ((Song) song).getTotalIncome();
+                        incomePerGenre[i] += ((Song) song).calculateTotalIncome();
                     }
                 }
             }
@@ -779,6 +820,6 @@ public class Controller {
             }
         }
         if(bestSeller == null) return "\nThere is not best seller yet";
-        return String.format("\n----- Best seller information -----%n - Name: %s%n - Sales number: %d%n - Income: $%.2f", bestSeller.getName(), ((Song)bestSeller).getNumberOfSales(), ((Song)bestSeller).getTotalIncome());
+        return String.format("\n----- Best seller information -----%n - Name: %s%n - Sales number: %d%n - Income: $%.2f", bestSeller.getName(), ((Song)bestSeller).getNumberOfSales(), ((Song)bestSeller).calculateTotalIncome());
     }
 }

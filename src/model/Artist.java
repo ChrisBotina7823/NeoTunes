@@ -20,4 +20,15 @@ public class Artist extends Producer {
         if(!(newAudio instanceof Song)) return false;
         return getAudios().add( newAudio );
     }
+
+    @Override
+    public String toString() {
+        return "Artist{" +
+                "name='" + getName() + '\'' +
+                ", joiningDate='" + super.getJoiningDate() + '\'' +
+                ", pictureUrl='" + getPictureUrl() + '\'' +
+                ", NumberOfPlays=" + calculateTotalPlays() +
+                ", TimePlayed=" + calculateTotalTimePlayed() +
+                '}';
+    }
 }

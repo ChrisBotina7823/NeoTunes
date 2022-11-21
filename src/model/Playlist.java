@@ -53,9 +53,9 @@ public class Playlist {
 
     /**
      * <pre>
-     * <strong>Description: </strong> Updates the id by generating a new matrix and, therefore, a new code.
-     * <strong>Pos: </strong> matrixId <strong>int[]</strong> Each position will be filled with a random value
-     * <strong>Pos: </strong> id <strong>String</strong> Will be changed or initialized to the new generated id.
+         * <strong>Description: </strong> Updates the id by generating a new matrix and, therefore, a new code.
+         * <strong>Pos: </strong> matrixId <strong>int[]</strong> Each position will be filled with a random value
+         * <strong>Pos: </strong> id <strong>String</strong> Will be changed or initialized to the new generated id.
      * </pre>
      */
     public void updateId() {
@@ -65,9 +65,11 @@ public class Playlist {
 
     /**
      * <pre>
-     * <strong>Description: </strong> Fill the 6x6 matrix with random numbers between 0-9
-     * <strong>Pre: </strong> matrixId <strong>int[]</strong> Must be initialized with random values
-     * <strong>Pos: </strong> matrixId <strong>int[]</strong> Each position will be filled with a random value
+         * <strong>Description: </strong> Fill the 6x6 matrix with random numbers between 0-9
+         * <strong>Pre: </strong> matrixId <strong>int[]</strong> Must be initialized with random values
+         * <strong>Pos: </strong> matrixId <strong>int[]</strong> Each position will be filled with a random value
+         * @param size <strong>int</strong> The size of the new matrix
+         * @return matrix <strong>int[][]</strong> The new random matrix
      * </pre>
      */
     public int[][] generateRandomMatrix(int size) {
@@ -139,15 +141,16 @@ public class Playlist {
      * <pre>
      * <strong>Description: </strong> It prints the matrix that generated the playlist identifier
      * <strong>pre: </strong> matrixId <strong>int[]</strong> Must be initialized
+     * @param matrix <strong>int[][]</strong> the matrix to print
      * @return matrixStr <strong>String</strong> a readable version of the matrix
      * </pre>
      */
     public String showMatrixId(int[][] matrix) {
         String matrixStr = "";
-        for(int i=0; i<matrix.length; i++) {
+        for (int[] ints : matrix) {
             matrixStr += "\n\t\t";
-            for(int j=0; j<matrix[i].length; j++) {
-                matrixStr += matrix[i][j] + " ";
+            for (int j = 0; j < ints.length; j++) {
+                matrixStr += ints[j] + " ";
             }
         }
         return matrixStr;

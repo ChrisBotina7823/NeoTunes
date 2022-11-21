@@ -34,4 +34,12 @@ public class PremiumConsumer extends Consumer {
         return getSongs().add(newSong);
     }
 
+    @Override
+    public String toString() {
+        return "PremiumConsumer{" +
+                "nickname='" + getNickname() + '\'' +
+                ", joiningDate='" + getJoiningDate() + '\'' +
+                ", documentId='" + getDocumentId() + '\'' +
+                '}';
+    }
 }

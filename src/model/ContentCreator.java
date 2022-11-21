@@ -20,4 +20,15 @@ public class ContentCreator extends Producer {
         if(!(newAudio instanceof Podcast)) return false;
         return getAudios().add( newAudio );
     }
+
+    @Override
+    public String toString() {
+        return "ContentCreator{" +
+                "name='" + getName() + '\'' +
+                ", joiningDate='" + super.getJoiningDate() + '\'' +
+                ", pictureUrl='" + getPictureUrl() + '\'' +
+                ", NumberOfPlays=" + calculateTotalPlays() +
+                ", TimePlayed=" + calculateTotalTimePlayed() +
+                '}';
+    }
 }

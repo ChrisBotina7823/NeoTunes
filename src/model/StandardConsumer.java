@@ -1,25 +1,45 @@
 package model;
 
 public class StandardConsumer extends Consumer implements Advertisable {
-    private int playedSongs;
+    private int songsPlayed;
 
     public StandardConsumer(String nickname, String documentId) {
         super(nickname, documentId);
-        this.playedSongs = 0;
+        this.songsPlayed = 0;
     }
 
 
     // GETTERS AND SETTERS
 
-    public int getPlayedSongs() {
-        return playedSongs;
+    public int getSongsPlayed() {
+        return songsPlayed;
     }
-    public void setPlayedSongs(int playedSongs) {
-        this.playedSongs = playedSongs;
+    public void setSongsPlayed(int songsPlayed) {
+        this.songsPlayed = songsPlayed;
     }
 
+    public void increasePlayedSongs() {
+        this.songsPlayed++;
+    }
 
     // PLAYLISTS AND SONGS
+
+    /**
+     * <pre>
+     * <strong>Description: </strong> It decides when to show an advertise before a song, each 3 songs it will return true, it also increases the count
+     * <strong>Pre: </strong> playedSongs <strong>int</strong> must be initialized
+     * <strong>Pos: </strong> playedSongs <strong>int</strong> will be increased by one
+     * @return status <strong>boolean</strong> true when showing advertisement.
+     * </pre>
+     */
+    @Override
+    public boolean showAdvertise() {
+        if(getSongsPlayed() % 3 == 0) {
+            return true;
+        }
+        increasePlayedSongs();
+        return false;
+    }
 
     /**
      * <pre>
@@ -51,18 +71,12 @@ public class StandardConsumer extends Consumer implements Advertisable {
         return getSongs().add(newSong);
     }
 
-    /**
-     * <pre>
-     * <strong>Description: </strong> It decides when to show an advertise before a song, each 3 songs it will return true, it also increases the count
-     * <strong>Pre: </strong> playedSongs <strong>int</strong> must be initialized
-     * <strong>Pos: </strong> playedSongs <strong>int</strong> will be increased by one
-     * @return status <strong>boolean</strong> true when showing advertisement.
-     * </pre>
-     */
     @Override
-    public boolean showAdvertise() {
-        if(playedSongs % 2 == 0) return true;
-        setPlayedSongs(getPlayedSongs()+1);
-        return false;
+    public String toString() {
+        return "StandardConsumer{" +
+                "nickname='" + getNickname() + '\'' +
+                ", joiningDate='" + getJoiningDate() + '\'' +
+                ", documentId='" + getDocumentId() + '\'' +
+                '}';
     }
 }

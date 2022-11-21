@@ -56,6 +56,7 @@ public abstract class Producer extends User {
      * <strong>Description: </strong> It adds a new audio to the artist's audios collection, ensuring that it is not already in it.
      * <strong>pre:</strong> audios <strong>ArrayList</strong> must be initialized
      * @param newAudio <strong>Audio</strong> the audio that is going to be added to the list
+     * @return status <strong>boolean</strong> true if the audio was added
      * </pre>
      */
     public abstract boolean addAudio(Audio newAudio);
@@ -84,7 +85,7 @@ public abstract class Producer extends User {
      * @return totalPlays <strong>int</strong> The total amount of plays that the producer audios have
      * </pre>
      */
-    public int getTotalPlays() {
+    public int calculateTotalPlays() {
         int totalPlays = 0;
         for(Audio audio: audios) {
             totalPlays += audio.getNumberOfPlays();
@@ -99,7 +100,7 @@ public abstract class Producer extends User {
      * @return totalTimePlayed <strong>int</strong> The total amount of time played for producer's audios
      * </pre>
      */
-    public int getTotalTimePlayed() {
+    public int calculateTotalTimePlayed() {
         int timePlayed = 0;
         for(Audio audio: audios) {
             timePlayed += audio.getNumberOfPlays() * audio.getDuration();
@@ -113,8 +114,8 @@ public abstract class Producer extends User {
                 "name='" + name + '\'' +
                 ", joiningDate='" + super.getJoiningDate() + '\'' +
                 ", pictureUrl='" + pictureUrl + '\'' +
-                ", NumberOfPlays=" + getTotalPlays() +
-                ", TimePlayed=" + getTotalTimePlayed() +
+                ", NumberOfPlays=" + calculateTotalPlays() +
+                ", TimePlayed=" + calculateTotalTimePlayed() +
                 '}';
     }
 }
